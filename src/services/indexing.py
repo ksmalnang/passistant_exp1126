@@ -50,13 +50,22 @@ class DocumentIndexingService:
 
     _EMBEDDING_BATCH_SIZE = 32
 
-    def __init__(self, vector_store: Any | None = None) -> None:
+    def __init__(
+        self,
+        vector_store: Any | None = None,
+        graph_indexer: Any | None = None,
+    ) -> None:
         if vector_store is None:
             from src.utils.vector_store import VectorStoreTools
 
             vector_store = VectorStoreTools()
         self._vs = vector_store
         self._cache: RedisCache = get_cache()
+        if graph_indexer is None:
+            from src.graph.indexing import build_graph_chunk_indexer
+
+            graph_indexer = build_graph_chunk_indexer()
+        self._graph_indexer = graph_indexer
 
         settings = get_settings()
         self._chunk_size = settings.CHUNK_SIZE
@@ -118,6 +127,7 @@ class DocumentIndexingService:
         if replace_existing:
             self._vs.delete_document_chunks(document.document_id)
         self._upsert_points(points)
+        graph_issues = self._sync_graph(document.document_id, points)
 
         self._invalidate_document_cache(document.document_id)
 
@@ -135,7 +145,26 @@ class DocumentIndexingService:
             document_id=document.document_id,
             chunk_count=len(chunks),
             indexed_chars=indexed_chars,
+            issues=graph_issues,
         )
+
+    def _sync_graph(self, document_id: str, points: list[PointStruct]) -> list[str]:
+        """Mirror chunk identity and deterministic entities into Neo4j when enabled."""
+        if self._graph_indexer is None:
+            return []
+        chunks = [
+            {
+                "chunk_id": point.payload["chunk_id"],
+                "text": point.payload["text"],
+                "document_id": point.payload["document_id"],
+                "filename": point.payload.get("filename"),
+                "doc_title": point.payload.get("doc_title"),
+                "chunk_index": point.payload.get("chunk_index"),
+                "page": (point.payload.get("source_locations") or [{}])[0].get("page"),
+            }
+            for point in points
+        ]
+        return self._graph_indexer.replace_document(document_id, chunks)
 
     def _build_page_boundaries(self, document: DocumentUpload) -> list[tuple[int, int]]:
         """Build a list of (start_offset, end_offset) pairs per page.

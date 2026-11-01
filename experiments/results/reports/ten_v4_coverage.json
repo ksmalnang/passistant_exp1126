@@ -1,0 +1,666 @@
+{
+  "schema_version": 1,
+  "run": {
+    "name": "ten_v4_coverage",
+    "started_at": "2026-10-27T11:31:29.664819+00:00",
+    "duration_seconds": 99.1,
+    "mode": "fixture",
+    "dataset": {
+      "name": "ten.jsonl",
+      "path": ".tmp_probe\\ten.jsonl",
+      "sample_count": 10
+    },
+    "retrieval": {
+      "strategy": "reranker",
+      "top_k": 10
+    },
+    "index": {
+      "collection": "",
+      "points": null,
+      "manifest": null
+    },
+    "models": {
+      "judge": "deepseek/deepseek-v4-flash-0731",
+      "embedding": "qwen/qwen3-embedding-8b:nitro",
+      "pipeline": "deepseek/deepseek-v4-flash-0731"
+    }
+  },
+  "aggregate": {
+    "sample_count": 10,
+    "metrics": {
+      "context_recall": {
+        "mean": 1.0,
+        "scored": 10
+      },
+      "factual_correctness(mode=f1)": {
+        "mean": 0.738,
+        "scored": 10
+      },
+      "faithfulness": {
+        "mean": 0.9167,
+        "scored": 10
+      }
+    }
+  },
+  "breakdown": {
+    "question_type": {
+      "conditional": {
+        "sample_count": 1,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.33,
+            "scored": 1
+          },
+          "faithfulness": {
+            "mean": 1.0,
+            "scored": 1
+          }
+        }
+      },
+      "multi_doc": {
+        "sample_count": 6,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 6
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.7083,
+            "scored": 6
+          },
+          "faithfulness": {
+            "mean": 1.0,
+            "scored": 6
+          }
+        }
+      },
+      "simple": {
+        "sample_count": 3,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 3
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.9333,
+            "scored": 3
+          },
+          "faithfulness": {
+            "mean": 0.7222,
+            "scored": 3
+          }
+        }
+      }
+    },
+    "topic": {
+      "beasiswa": {
+        "sample_count": 1,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "faithfulness": {
+            "mean": 0.5,
+            "scored": 1
+          }
+        }
+      },
+      "cuti": {
+        "sample_count": 1,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.86,
+            "scored": 1
+          },
+          "faithfulness": {
+            "mean": 1.0,
+            "scored": 1
+          }
+        }
+      },
+      "kurikulum": {
+        "sample_count": 1,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.5,
+            "scored": 1
+          },
+          "faithfulness": {
+            "mean": 1.0,
+            "scored": 1
+          }
+        }
+      },
+      "mbkm": {
+        "sample_count": 1,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "faithfulness": {
+            "mean": 1.0,
+            "scored": 1
+          }
+        }
+      },
+      "sks": {
+        "sample_count": 2,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 2
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.8,
+            "scored": 2
+          },
+          "faithfulness": {
+            "mean": 0.8334,
+            "scored": 2
+          }
+        }
+      },
+      "tugas_akhir": {
+        "sample_count": 1,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 1.0,
+            "scored": 1
+          },
+          "faithfulness": {
+            "mean": 1.0,
+            "scored": 1
+          }
+        }
+      },
+      "ujian": {
+        "sample_count": 3,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 3
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.4733,
+            "scored": 3
+          },
+          "faithfulness": {
+            "mean": 1.0,
+            "scored": 3
+          }
+        }
+      }
+    },
+    "answerable": {
+      "True": {
+        "sample_count": 10,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 10
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.738,
+            "scored": 10
+          },
+          "faithfulness": {
+            "mean": 0.9167,
+            "scored": 10
+          }
+        }
+      }
+    },
+    "dataset_version": {
+      "public_beta_v1": {
+        "sample_count": 10,
+        "metrics": {
+          "context_recall": {
+            "mean": 1.0,
+            "scored": 10
+          },
+          "factual_correctness(mode=f1)": {
+            "mean": 0.738,
+            "scored": 10
+          },
+          "faithfulness": {
+            "mean": 0.9167,
+            "scored": 10
+          }
+        }
+      }
+    }
+  },
+  "usage": {
+    "chat_requests": 70,
+    "embedding_requests": 0,
+    "prompt_tokens": 94211,
+    "completion_tokens": 12229,
+    "total_tokens": 106440,
+    "cost_usd": 0.014873,
+    "request_count": 70
+  },
+  "samples": [
+    {
+      "id": "d1-01",
+      "user_input": "Min, kalau cuti akademik itu boleh berapa lama ya? Sama biayanya berapa?",
+      "reference": "Batas waktu maksimal untuk cuti akademik adalah 2 tahun akademik (dengan minimal 1 tahun akademik). Mahasiswa yang cuti diwajibkan membayar biaya administrasi sebesar 5% dari DPP satu tahun berjalan.",
+      "response": "Cuti akademik minimal satu tahun akademik dan maksimal 2 tahun akademik [1]. Biaya administrasi untuk cuti adalah sebesar 5% dari DPP satu tahun [2].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "e) Biaya untuk pengurusan ketiga dokumen tersebut sudah masuk ke biaya BPA2DK mulai angkatan 2022\n## IV.9. Aturan Akademik Yang Perlu Diperhatikan\n## IV.9.1. Cuti Akademik\nBagi mahasiswa yang karena sesuatu hal tidak dapat mengikuti kuliah dalam waktu yang cukup lama, maka dapat mengajukan untuk meninggalkan studi sementara waktu (cuti akademik). Yang dimaksud dengan cuti akademik adalah pembebasan mahasiswa dari kewajiban mengikuti kegiatan akademik/kuliah selama jangka waktu tertentu karena alasan-alasan yang dapat dipertanggungjawabkan (sakit, kewajiban sosial, kewajiban pekerjaan, perkembangan diri).\nBerikut peraturan rinci terkait cuti akademik:\na. Cuti akademik, minimal satu tahun akademik dan maksimal 2 tahun akademik\nb. Cuti akademik tidak menambah masa studi . Masa Studi tetap 7 tahun termasuk masa cuti yang diambil.\nc. Tetap berstatus sebagai mahasiswa dan wajib melakukan herregistrasi setiap tahun selama menjalani cuti akademiknya.",
+        "c. Tetap berstatus sebagai mahasiswa dan wajib melakukan herregistrasi setiap tahun selama menjalani cuti akademiknya.\nd. Masa pengurusan cuti akademik adalah 1 Juli - 30 September\ne. Biaya administrasi untuk cuti adalah sebesar 5% dari DPP satu tahun\nPermohonan cuti diajukan sebelum semester yang bersangkutan dimulai, oleh mahasiswa untuk diteruskan oleh Program Studi, dan fakultas kepada rektorat. Sebelum dikeluarkan surat ijin cuti, mahasiswa tidak memiliki hak untuk meninggalkan kegiatan akademis di Fakultas Teknik.\nPersyaratan untuk memperoleh surat ijin cuti, adalah :\na. Masih terdaftar sebagai mahasiswa Fakultas Teknik dan telah melunasi DPP tahun terakhir\nb. Tidak berstatus sebagai mahasiswa penerima bea siswa, ikatan tugas dan tugas belajar.\nc. Mendapat persetujuan dari dosen wali, ketua Program Studi dan Dekan\nd. Belum habis masa studi\ne. Telah tedaftar sebagai mahasiswa Fakultas Teknik minimal satu tahun",
+        "Mahasiswa Data Berhenti Studi Mahasiswa Mahasiswa\n\n</div>\n\n<div align=\"center\">\n\n# PROSEDUR CUTI AKADEMIK\n\n</div>\n## Mahasiswa berkonsultasi dengan Dosen Wali / Konseling\nMahasiswa mengajukan permohonan Cuti kepada Ketua Prodi dengan melampirkan :\n- Surat Permohonan\n- Data Pribadi Mahasiswa\n- Transkip Akademik\n- Pertimbangan dari Dosen Wali / Konseling\n- Bukti Lunas DPP tahun sebelumnya\n## 3 Mahasiswa menunggu surat permohonan Cuti yang akan disetujui oleh Rektor dalam bentuk Surat Keputusan Rektor\nSurat Keputusan Rektor\nMahasiswa membayar uang administrasi ke UNPAS dengan melampirkan Surat keputusan Rektor\n## 5 Mahasiswa menunggu prosedur Cutidiproses oleh pihak Kampus UNPAS\n## 6 Rektor melaporkan kepada Kopertis\n7 Mahasiswa menjalani Cuti Akademik\n\n<div align=\"center\">\n\n# PROSEDUR PERMOHONAN\n\nAKTIF AKADEMIK",
+        "## IV.8. Ijazah , Transkrip, dan SKPI\nMahasiswa yang sudah dinyatakan lulus melalui sebuah SK Yudisium akan mendapatkan tiga dokumen kelulusan, yakni\na) Ijazah yang dilengkapi dengan NINA ( Nomor Induk Ijazah Nasional) yang ditandatangani oleh Dekan dan Rektor. Identitas tahun pada NINA sama dengan tanggal ijazah rektor\nb) Transkrip Akademik, yang berisi semua mata kuliah yang diambil dan dinyatakan lulus\nc) SKPI , yang berisi uraian tentang CPL Prodi yang dilampiri dengan SKPM .\nd) Legalisir untuk Ijazah dan transkrip sebanyak masing-masing @10 eksemplar. Jika ketiga dokumen tersebut menggunakan TTE , maka legalisir tidak lagi diberikan.\ne) Biaya untuk pengurusan ketiga dokumen tersebut sudah masuk ke biaya BPA2DK mulai angkatan 2022\n## IV.9. Aturan Akademik Yang Perlu Diperhatikan\n## IV.9.1. Cuti Akademik",
+        "## f. Tidak sedang menjalani sanksi akademis.\nProsedur cuti akademik dan pengajuan aktif kembali dapat dilihat pada gambar dibawah ini.\nTambahan, pada langkah ke 2 surat dan dokumen di satukan di PDF untuk kemudian dilakukan pengajuan secara online melalui SITU 2.0\nKlik Tambah, Isikan ajuan Anda dan upload bundle dokumen yang di dapat dari prodi\n<div align=\"center\">\n\nMahasiswa Data Berhenti Studi Mahasiswa Mahasiswa\n\n</div>\n\n<div align=\"center\">\n\n# PROSEDUR CUTI AKADEMIK",
+        "IV.2. Perkuliahan ... 65\n\nIV.2.1. Bentuk Perkuliahan ... 65\n\nIV.2.2. Standar Perkuliahan BLENDED ... 65\n\nIV.2.3. Frekuensi Perkuliahan ... 66\n\nIV.2.4. LMS Platform Perkuliahan ... 67\n\nIV.3. Penilaian ... 68\n\nIV.3.1. Ujian Tengah Semester (UTS) ... 69\n\nIV.3.2. Ujian Akhir Semeaster (UAS) ... 69\n\nIV.3.3. Ujian Susulan ... 69\n\nIV.3.4. Evaluasi Keberhasilan Studi ... 70\n\nIV.3.5. SKPM sebagai Lampiran SKPI ... 73\n\nIV.4. Mata Kuliah Kerja Praktek (KP) ... 74\n\nIV.5. Tugas Akhir / Skripsi/ Project Capstone Design / Publikasi Ilmiah (TSPP) ... 75\n\nIV.6. Yudisium ... 77\n\nIV.7. Wisuda ... 78\n\nIV.8. Ijazah , Transkrip, dan SKPI ... 79\n\nIV.9. Aturan Akademik Yang Perlu Diperhatikan ... 79\n\nIV.9.1. Cuti Akademik ... 79\n\nIV.9.2. Pelanggaran dan Sanksi Akademik ... 83\n\nIV.9.3. Evaluasi Kinerja akademik dan Eksekusi Akhir Masa Studi ... 85\n\nIV.9.4. Program MBKM Di Lingkungan Fakultas Teknik ... 85\n\nV. LABORATORIUM dan SARANA PENDUKUNG LAINNYA ... 88\n\nV.1. Laboratorium ... 88",
+        "UNIVERSITAS PASUNDAN",
+        "<div align=\"center\">\n\n# PROSEDUR PERMOHONAN\n\nAKTIF AKADEMIK\n\n</div>\nMahasiswa mengajukan permohonan Aktif Kuliah kembali kepada BAA dengan menyerahkan Surat Keputusan Rektor mengenai Cuti Akademik\nMahasiswa menunggu proses permohonan Aktif Akademik yang akan diproses oleh BAA dan Rektor\n3 Rektor menembuskan Surat Keputusan pengaktifan kembali mahasiswa kepada Wadek 1\nMahasiswa melaporkan kepada Wadek 1 dan Wadek 2 untuk Aktif Kuliah kembali dengan membawa Surat Keputusan Rektor mengenai Aktif Kuliah kembali\n5 Wadek 1 meneruskan permohonan Aktif Kuliah kembali kepada Ketua Prodi\n6 Ketua Prodi menyetujui dan mendata kembali Mahasiswa yang aktif kuliah kembali\n7 Mahasiswa Aktif Kuliah kembali",
+        "UNIVERSITAS PASUNDA\nProf. Dr. Ir. Yusman Taufik, MP.\n\nTeknik Industri □ 022 - 2019335\n\nTeknologi Pangan □ 022 - 2019339\n\nTeknik Mesin □ 022 - 2019352\n\nTeknik Informatika □ 022 - 2019371\n\nTeknik Lingkungan □ 022 - 2009574\n\nun Wilayah dan Kota □ 022 - 2006466\nSURAT KEPUTUSAN\n\nDEKAN FAKULTAS TEKNIK UNIVERSITAS PASUNDAN BANDUNG",
+        "BUKU PANDUAN\n\nAKADEMIK\n\nFAKULTAS TEKNIK\n\nTahun Akademik 2023/2024\nfakultasteknikunpas | www.teknik.unpas.ac.id\n\n<div align=\"center\">\n\n# Kata Pengantar"
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 1.0,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 0.86
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Wadek1-Buku Panduan Akademik FT Unpas 2023-2024 Publish.pdf",
+        "difficulty": "easy",
+        "reasoning_type": "multi-hop",
+        "noise_level": "low",
+        "original_id": "ragas_q1",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "multi_doc",
+        "topic": "cuti",
+        "source_doc_ids": []
+      }
+    },
+    {
+      "id": "d1-02",
+      "user_input": "Kalo nilai UTS jelek dan nilai akhir dapat D, apa bisa ikut remedial? Maksimal dapet nilai apa?",
+      "reference": "Mahasiswa yang mendapatkan nilai D (serta B, BC, C, E) pada semester aktif dihimbau untuk mengikuti pekan remedial. Nilai maksimal yang bisa diperoleh dari remedial tersebut adalah AB.",
+      "response": "Berdasarkan informasi yang tersedia, mahasiswa yang mendapatkan nilai D pada semester aktif diwajibkan mengikuti pekan remedial [1]. Nilai maksimal yang dapat diperoleh setelah mengikuti remedial adalah AB [1].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "a. Jumlah minggu perkuliahan dalam satu semester adalah 14 minggu, tidak termasuk ujian tengah semester (UTS) dan ujian akhir semester (UAS). Normalnya adalah sebagai berikut\n- 7 Sesi Perkuliahan ( 7 minggu)\n- UTS (1-2 minggu)\n- 7 Sesi Perkuliahan ( 7 Minggu)\n- Minggu Persiapan Ujian (opsional)\n- UAS (1-2 minggu)\nb. Bagi dosen yang belum mencapai jumlah 14 minggu pertemuan, diharuskan melengkapi perkuliahan sebelum saat ujian akhir mata kuliah tersebut dilaksanakan.\nc. Bagi mahasiswa yang mendapatkan nilai B, BC, C, D, E pada semester aktif, dihimbau mengikuti pekan remed ganjil . Maksimal nilai yang diperoleh saat remed adalah AB. Mekanisme sesi remedial diatur dalam surat edaran.\nJika setelah mengikuti remett nilai tetap D atau E maka mahasiswa akan mengulang mata kuliah tersebut di tahun berikutnya",
+        "g) Ujian UAS\nh) Penilaian Akhir\ni) Pengisian Kuesioner Evaluasi PBM untuk melihat Nilai\nj) Masa Remedial Teaching & Testing ( wajib bagi yang nilainya D, E dan opsional bagi yang nilainya B,BC, C)\na) Registrasi pembayaran dpp\nb) Perwalian ( maksimal mengambil 24 sks jika IPK >3.0)\nc) Proses Belajar-Mengajar ( Perkuliahan Sesi 1)\nd) Ujian (UTS)\ne) Proses Belajar-Mengajar ( Perkuliahan Sesi 2)\nf) Ujian UAS\ng) Penilaian Akhir\nh) Pengisian Kuesioner Evaluasi PBM untuk melihat Nilai\ni) Masa Remedial Teaching & Testing ( wajib bagi yang nilainya D, E dan opsional bagi yang nilainya B,BC, C)\n## Untuk mahasiswa yang mengikuti MBKM, dengan syarat sudah melewati semester 4, IPK>3.0 dan raihan SKS Lulus >=70, maka alurnya adalah sebagai berikut\na) Pengajuan\n- Untuk MBKM atas biaya DIKTI, mahasiswa meminta surat pengantar dari kampus untuk mendaftar ke DIKTI. Jika sudah diterima baru mengentrykan ajuan ke SITU 2.0",
+        "- Tiap mata kuliah inti harus lulus dengan Nilai Akhir $ \\geq $ C atau sesuai definisi di kurikulum\n- Skripsi harus lulus dengan Nilai akhir $ \\geq $ C\nb. IPK $ \\geq 2. 0 $ dengan ketentuan :\n- Proses perhitungan IPK ini sama dengan proses perhitungan IPs,",
+        "</div>\n| Unsur Nilai | Persentase |\n| --- | --- |\n| TUGAS INDIVIDU | 20.00% |\n| UTS | 30.00% |\n| UAS | 30.00% |\n| Keterlibatan | 20.00% |\n| KEHADIRAN | 50.00% |\n| Aktivitas di LMS | 50.00% |\n| TOTAL | 100% |\n| TOTAL | 100% |\n## IV.3.1. Ujian Tengah Semester (UTS)\nUjian Tengah Semester adalah ujian yang dilakukan untuk mengevaluasi penguasaan CPMK ( Capaian Pembelajaran Mata Kuliah) selama kurun 1/2 (setengah) semester proses pembelajaran. Sebuah kelas untuk mata kuliah tertentu bisa diselenggarakan UTS jika jumlah pertemuan minimal 5 kali.\nUntuk dapat mengikuti UTS dari tiap matakuliah setiap mahasiswa harus memenuhi syarat-syarat :\na. Telah menyelesaikan administrasi keuangan (DPP/SPP) 50 %.\nb. Telah terlibat dalam perkuliahan sekurang-kurangnya 75 % dari sesi dan aktivitas yang telah diselenggarakan oleh dosen kelas masing-masing pada semester yang bersangkutan.\n## IV.3.2. Ujian Akhir Semeaster (UAS)",
+        "| GRADE | BOBOT ANGKA | PEMETAAN ke NILAI 0-100 | PERINGKAT | DESKRIPSI |\n| --- | --- | --- | --- | --- |\n| A | 4 | 80-100 | Istimewa | Menuntaskan CPL/CPMK dengan istimewa |\n| AB | 3,5 | 70-79,9 | Sangat Baik | Menuntaskan CPL/CPMK dengan sangat baik |\n| B | 3 | 60-69,9 | Baik | Menuntaskan CPL/CPMK dengan baik |\n| BC | 2,5 | 50-59,9 | Cukup Baik | Menuntaskan CPL/CPMK dengan predikat cukup baik |\n| C | 2 | 40-49,9 | Cukup | Menuntaskan CPL/CPMK dengan predikat cukup |\n| D | 1 | 30-39,9 | Kurang | Menuntaskan CPL/CPMK dengan predikat Kurang |\n| E | 0 | 0-29,9 | Gagal | Gagal Menuntaskan CPL/CPMK |\n## B. Evaluasi Keberhasilan Studi Setiap Semester\nEvaluasi dilakukan pada akhir tiap semester. Keberhasilan studi tiap semester diukur dengan indeks prestasi (IP). Proses perhitungan indeks prestasi untuk setiap semester sebagai berikut :\na. Mengetahui SKS x bobot untuk tiap mata kuliah yang ditempuh.",
+        "## IV.6. Yudisium\nYudisium adalah proses penilaian akhir dari seluruh mata kuliah yang telah diambil mahasiswa dan penetapan nilai dalam transkrip akademik, serta memutuskan nilai IPK terakhir serta grade yudisiumnya.\nMasa studi terpakai tidak lebih dari 5 tahun. Adapun kualitas yudisium lulusan program studi strata 1 (S1) dinyatakan dengan predikat sebagai berikut :\n| - | : IPK<2.75 | : IPK<2.75 |\n| --- | --- | --- |\n| Memuaskan | : 2,75≤IPK<3,00 | : 2,75≤IPK<3,00 |\n| Sangat Memuaskan | : 3,01≤IPK<3,50 | : 3,01≤IPK<3,50 |\n| Dengan Pujian (Cum Laude) | : 3,51≤IPK≤4,00 dengan syarat masa studi<=5 tahun | : 3,51≤IPK≤4,00 dengan syarat masa studi<=5 tahun |\nMahasiswa yang sudah selesai melakukan sidang dan revisi akan didaftarkan sebagai peserta yudisium oleh petugas. Setelah di daftarkan mahasiswa bisa melakukan pengajuan yudisium. Di menu tersebut mahasiswa harus melengkapi beberapa persyaratan yang diperlukan untuk dokumen kelulusan.\n<div align=\"center\">\n\nAlur mahasiswa Yudisium",
+        "## IV.1.2. Tahap Perwalian Reguler\n## A. Mengajukan KRS\n1. Pengambilan KRS untuk semester I dan II adalah paket, yakni otomatis oleh sistem akan disetting mata kuliah yang diambil sesuai paket berdasarkan kurikulumnya\n2. Untuk semester III dan seterusnya, pengambilan matakuliah berdasarkan Indeks Prestasi (IPs) yang diperoleh pada Semester Ganjil atau Genap tahun akademik sebelumnya. Maksimal KRS yang bisa Anda\n3. IPs tersebut dapat dilihat di menu Kartu Hasil Studi (KHS) Semester Ganjil atau Genap Tahun Akademik sebelumnya melalui aplikasi SITU 2.0\n4. Pengambilan SKS Perwalian berdasarkan Raihan IPS sesuai dengan ketentuan sebagai berikut:\n| IPS(Indeks Prestasi Semester) |  | SKS Maksimum yang diambil |\n| --- | --- | --- |\n| IPs≤3.0 | : | 20 |\n| Ips>3.0 | : | 24 |\n5. Pengambilan matakuliah diprioritaskan Semester Terendah yang belum diselesaikan, artinya mahasiswa harus mendahulukan matakuliah-matakuliah yang belum lulus dari semester terendah.",
+        "Meliputi proses pembayaran biaya praktikum dan enrollment ke LMS untuk praktikum. Proses ini dilakukan terpadu oleh Fakultas Teknik dengan rentang waktu tertentu. Pendaftaran praktikum yang melampaui rentang waktu ini lalu akan dikelola oleh Prodi.\n## 2. Pindah Jadwal Praktikum\nProsedur ini dapat ditempuh oleh mahasiswa yang mendapati jadwal matakuliah praktikum bentrok dengan jadwal matakuliah lain atau program akademik yang sedang diikuti (perlombaan, inkubasi, magang, MBKM).\n## 3. Koreksi Nilai Praktikum\nJika terdapat kesalahan perhitungan nilai MK praktikum, mahasiswa dapat menempuh prosedur ini dan nilai yang bisa dikoreksi maksimal 1 semester setelah nilai tersebut keluar.\nContoh 1: Jika MK Praktikum di semester Ganjil 2021/2022, maksimal koreksi nilai dilakukan pada Semester Genap 2021/2022.\nContoh 2: Jika MK Praktikum di semester Genap 2021/2022, maksimal koreksi nilai dilakukan pada Semester Ganjil 2022/2023.\n## 4. Penyetaraan Nilai Praktikum Program MBKM",
+        "1",
+        "## Prosedur Ujian Susulan, adalah sebagai berikut :\n1. Mahasiswa memasukkan persyaratan Ujian Susulan ke Piket Ujian atau Sub Bagian Akademik Fakultas Teknik paling lambat 2 (dua) hari setelah pelaksanaan mata kuliah tersebut diujikan.\n2. Mahasiswa megikuti ujian susulan pada jadual yang telah ditentukan paling lambat 2 minggu setelah ujian berlangsung."
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 1.0,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 0.29
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Wadek1-Buku Panduan Akademik FT Unpas 2023-2024 Publish.pdf",
+        "difficulty": "medium",
+        "reasoning_type": "multi-hop",
+        "noise_level": "low",
+        "original_id": "ragas_q2",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "multi_doc",
+        "topic": "ujian",
+        "source_doc_ids": []
+      }
+    },
+    {
+      "id": "d1-03",
+      "user_input": "Saya IPK nya 3.1 nih kak, semester depan bisa ambil berapa SKS maksimal?",
+      "reference": "Berdasarkan aturan perwalian reguler, mahasiswa dengan Indeks Prestasi Semester (IPS) lebih dari 3.0 diperbolehkan mengambil beban studi maksimal 24 SKS, sedangkan mahasiswa dengan IPS 3.0 atau kurang hanya dapat mengambil maksimal 20 SKS.",
+      "response": "Berdasarkan ketentuan, pengambilan SKS maksimum untuk perwalian reguler adalah **24 SKS** jika **IPs > 3.0**, dan **20 SKS** jika **IPs ≤ 3.0** [1]. Dengan IPK 3.1, Anda dapat mengambil maksimal **24 SKS** [1].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "## IV.1.2. Tahap Perwalian Reguler\n## A. Mengajukan KRS\n1. Pengambilan KRS untuk semester I dan II adalah paket, yakni otomatis oleh sistem akan disetting mata kuliah yang diambil sesuai paket berdasarkan kurikulumnya\n2. Untuk semester III dan seterusnya, pengambilan matakuliah berdasarkan Indeks Prestasi (IPs) yang diperoleh pada Semester Ganjil atau Genap tahun akademik sebelumnya. Maksimal KRS yang bisa Anda\n3. IPs tersebut dapat dilihat di menu Kartu Hasil Studi (KHS) Semester Ganjil atau Genap Tahun Akademik sebelumnya melalui aplikasi SITU 2.0\n4. Pengambilan SKS Perwalian berdasarkan Raihan IPS sesuai dengan ketentuan sebagai berikut:\n| IPS(Indeks Prestasi Semester) |  | SKS Maksimum yang diambil |\n| --- | --- | --- |\n| IPs≤3.0 | : | 20 |\n| Ips>3.0 | : | 24 |\n5. Pengambilan matakuliah diprioritaskan Semester Terendah yang belum diselesaikan, artinya mahasiswa harus mendahulukan matakuliah-matakuliah yang belum lulus dari semester terendah.",
+        "g) Ujian UAS\nh) Penilaian Akhir\ni) Pengisian Kuesioner Evaluasi PBM untuk melihat Nilai\nj) Masa Remedial Teaching & Testing ( wajib bagi yang nilainya D, E dan opsional bagi yang nilainya B,BC, C)\na) Registrasi pembayaran dpp\nb) Perwalian ( maksimal mengambil 24 sks jika IPK >3.0)\nc) Proses Belajar-Mengajar ( Perkuliahan Sesi 1)\nd) Ujian (UTS)\ne) Proses Belajar-Mengajar ( Perkuliahan Sesi 2)\nf) Ujian UAS\ng) Penilaian Akhir\nh) Pengisian Kuesioner Evaluasi PBM untuk melihat Nilai\ni) Masa Remedial Teaching & Testing ( wajib bagi yang nilainya D, E dan opsional bagi yang nilainya B,BC, C)\n## Untuk mahasiswa yang mengikuti MBKM, dengan syarat sudah melewati semester 4, IPK>3.0 dan raihan SKS Lulus >=70, maka alurnya adalah sebagai berikut\na) Pengajuan\n- Untuk MBKM atas biaya DIKTI, mahasiswa meminta surat pengantar dari kampus untuk mendaftar ke DIKTI. Jika sudah diterima baru mengentrykan ajuan ke SITU 2.0",
+        "## c) MBKM Mandiri oleh mahasiswa dibiayai oleh orang tua mahasiswa\nDari sisi pelaksanaan, kegiatan MBKM dibagi menjadi 2 yakni full time MBKM dan partial MBKM.\nf) Fully MBKM, mahasiswa dalam satu semester melakukan semua kegiatan belajar diluar kampus dan berhak mendapatkan konversi 20 sks\ng) Partially MBKM, selain melakukan kegiatan belajar di luar kampus juga melakukan kegiatan PBM di dalam kampus. SKS yang diambil di semester adalah campuran antara konversi MBKM dan KRS reguler\nPersyaratan umum mahasiswa mengikuti MBKM adalah\nh) Sudah melalui semester 4\ni) Sks lulus minimal 70\nj) Ipk minimal 3.0\nk) Akumulasi SKS konversi pada MBKM yang diikuti sebelumnya masih kurang dari 30 sks. Maksimal bisa dikonversi untuk semua MBKM yang dilakukan adalah 40 sks\nPersyaratan khususnya adalah\na) Diijinkan oleh pimpinan prodi\nb) Status mahasiswa pada saat mengajukan MBKM adalah aktif\nc) Mahasiswa menyetujui estimasi mata kuliah yang akan dikonversi",
+        "| 5 | Penelitian/Riset | 20 | ≤20 | Mata kuliah pilihan 1,2,3,4(Maksimal 12 SKS)Mata kuliah Kualifikasi Penelitian(2 SKS)Mata kuliah Bahasa Inggris(2 SKS)-optionalMata kuliah Tugas Akhir(6 SKS)Mata kuliah Sosio Informatika &Profesionalisme(2 SKS) |\n| --- | --- | --- | --- | --- |\n| 6 | Studi/Proyek Independen | 20 | ≤20 | Mata kuliah pilihan 1,2,3,4(maks12 SKS)Mata kuliah KP(2 SKS)Mata kuliah Bahasa Inggris(2 SKS)-optionalMata kuliah sesuai tema magang(6-12 sks)Mata kuliah Sosio Informatika &Profesionalisme(2 SKS)-optional |\n| 7 | Proyek kemanuasiaan | 20 | ≤20 | Mata kuliah pilihan 1,2,3,4(maks12 SKS)Mata kuliah KP(2 SKS)Mata kuliah Bahasa Inggris(2 SKS)-optionalMata kuliah sesuai tema kegiatankemanuasiaan(0-12 sks)Mata kuliah Sosio Informatika &Profesionalisme(2 SKS)-optional |\nJika ada mata kuliah yang tidak dapat dikonversi ke BKP MBKM, maka akan dibuatkan menjadi Portofolio untuk Surat Keterangan Pendamping Ijazah (SKPI)",
+        "## 8.3 Pembelajaran mata kuliah (MK) di luar Program Studi\n| No | Menempuh MK | Bobot sks maksimum | Keterangan |\n| --- | --- | --- | --- |\n| 1 | Di luar PRODI di dalam kampus | 12 | Mata kuliah pilihan 1,2,3,4 |\n| 2 | Di PRODI yang sama di luar Kampus | 20 | Mata kuliah pilihan, sesuai konversi mata kuliah semester 5,6,atau 7 |\n| 3 | Di PRODI yang berbeda di luar Kampus | 12 | Mata kuliah pilihan 1,2,3,4 |\n| Total bobot sks maksimum | Total bobot sks maksimum | 20 |  |\n## 8.4 Bentuk Kegiatan Pembelajaran di Luar Perguruan Tinggi\n| No | Bentuk Kegiatan Pembelajaran | Dapat dilaksanakan dg bobot sks | Dapat dilaksanakan dg bobot sks | Keterangan |\n| --- | --- | --- | --- | --- |\n| No | Bentuk Kegiatan Pembelajaran | Reguler | MBKM | Keterangan |",
+        "## III. KURIKULUM\n## III.1. Program Studi Teknik Industri Semester I\n| No | Kode | Matakuliah | SKS |\n| --- | --- | --- | --- |\n| 1 | TI22W1101 | Pendidikan Agama | 2 |\n| 2 | TI22W1102 | Bahasa Inggris | 2 |\n| 3 | TI22W1108 | Literasi Digital | 2 |\n| 4 | TI22W2103 | Menggambar Teknik+Prakt | 3 |\n| 5 | TI22W2104 | KalkulusI | 3 |\n| 6 | TI22W2105 | KimiaI | 3 |\n| 7 | TI22W2106 | FisikaI | 2 |\n| 8 | TI22W2107 | Pengantar TeknikIndustri | 2 |\n| Jumlah SKS | Jumlah SKS | Jumlah SKS | 19 |\n<div align=\"center\">\n\nSemester II\n\n</div>\n| No | Kode | Matakuliah | SKS |\n| --- | --- | --- | --- |\n| 1 | TI22W1201 | Ilmu Budaya Sunda | 2 |\n| 2 | TI22W1204 | Pancasila | 2 |\n| 3 | TI22W1205 | Bahasa Indonesia | 2 |\n| 4 | TI22W1207 | Islam Disiplin Ilmu | 2 |\n| 5 | TI22W1208 | Kimia II | 3 |\n| 6 | TI22W2202 | Fisika II | 2 |\n| 7 | TI22W2203 | Kalkulus II | 3 |\n| 8 | TI22W2206 | Pendidikan Kewarganegaraan | 2 |\n| Jumlah SKS | Jumlah SKS | Jumlah SKS | 18 |\n<div align=\"center\">\n\nSemester III",
+        "Mahasiswa yang terkena evaluasi oleh Program Studi meliputi tahap sebagai berikut:\na. Tahap I Mahasiswa pada Akhir Tahun Akademik II :\n$$\n\\mathrm {I P K} < = 2, 0; \\mathrm {S K S} < = 4 0\n$$\nb. Tahap II Mahasiswa pada Akhir Tahun IV IPK <= 2,0; SKS <= 90\nc. Tahap III Mahasiswa pada Akhir Tahun VI IPK <= 2,0; SKS <= 130\nd. Reguler setiap awal tahun akademik jika tiga semester berturut-turut tidak aktif\nEksekusi akhir masa studi adalah penetapan status akademik seorang mahasiswa dinyatakan mengundurkan diri/ keluar melalui SK Rektor. Eksekusi akhir masa studi dilakukan terhadap\n1. Mahasiswa yang tidak aktif selama 4 semester berturut-tutur , penetapan dilakukan pada saat awal semester ke 5 ybs tidak aktif\n2. Mahasiswa yang sampai pada akhir semester 14 belum dinyatakan lulus (30 September)\n3. Mahasiswa yang dengan capaian SKS lulus dan sisa jatah waktu studinya yang masih tersisa tidak memungkinkan untuk bisa lulus pendidikan sarjana, yakni\na. Akhir Tahun ke V, sks lulus <=48",
+        "Semester III\n\n</div>\n| No | Kode | Matakuliah | SKS |\n| --- | --- | --- | --- |\n| 1 | TI22W1305 | Mekanika Teknik | 2 |\n| 2 | TI22W2302 | Kalkulus III | 3 |\n| 3 | TI22W2306 | Pengetahuan Bahan | 2 |\n| 4 | TI22W2307 | Pengetahuan Lingkungan | 2 |\n| 5 | TI22W3301 | Teori Peluang | 3 |\n| 6 | TI22W3308 | Pemrograman Komputer+Prakt. | 2 |\n| 7 | TI22W4303 | Organisasi Industri | 2 |\n| 8 | TI22W4304 | Manajemen Kualitas | 2 |\n| Jumlah SKS | Jumlah SKS | Jumlah SKS | 18 |\n<div align=\"center\">\n\nSemester IV\n\n</div>\n| No | Kode | Matakuliah | SKS |\n| --- | --- | --- | --- |\n| 1 | TI22W3402 | Statistika | 3 |\n| 2 | TI22W3403 | Manajemen Pemasaran | 2 |\n| 3 | TI22W3405 | Praktikum Statistika | 1 |\n| 4 | TI22W4401 | Psikologi Industri | 2 |\n| 5 | TI22W4404 | Analisis Pengukuran Kerja | 2 |\n| 6 | TI22W4406 | Enterprise Resource Planning | 2 |",
+        "## 8 Implementasi Hak Belajar Mahasiswa Maksimum 3 Semester\n## 8.1 Model implementasi MBKM\n| No | MK | SKS | Penyetaraan Paket MBKM Prodi |\n| --- | --- | --- | --- |\n| Semester 3 | Semester 3 | Semester 3 | Pertukaran Pelajar (UUM) |\n| 1 | Matematika Informatika II | 3 | √ |\n| 2 | Algoritma dan Pemograman II | 3 | √ |\n| 3 | Rekayasa Perangkat Lunak | 3 | √ |\n| 4 | Praktikum Basis Data | 2 | √ |\n| 5 | Infrastruktur Pendukung Aplikasi | 2 | √ |\n| 6 | Praktikum Infrastruktur | 1 |  |\n| 7 | Organisasi & Proses Bisnis | 2 | √ |\n| 8 | Kewarganegaraan | 2 |  |\n| No | MK | SKS | Penyetaraan Paket MBKM Prodi |\n| --- | --- | --- | --- |\n| Semester 4 | Semester 4 | Semester 4 | Pertukaran Pelajar (UUM) |\n| 1 | Pemograman Berorientasi Objek | 3 | √ |\n| 2 | Interaksi Manusia dan Komputer | 3 | √ |\n| 3 | Teori Komputasi | 2 | √ |\n| 4 | Praktikum Pemograman I | 2 | √ |\n| 5 | Sistem Manajemen Basis Data | 3 | √ |\n| 6 | Sistem Informasi | 3 | √ |\n| 7 | Praktikum Multimedia | 2 | √ |",
+        "Semester III\n\n</div>\n| No | Kode | Matakuliah | SKS |\n| --- | --- | --- | --- |\n| 1 | PWK21W0301 | Statistik Untuk Perencanaan | 2 |\n| 2 | PWK21W0302 | Analisis Lokasi & Pola Keruangan | 2 |\n| 3 | PWK21W0303 | Teori & Studio Proses Perencanaan | 3 |\n| 4 | PWK21W0304 | Pengantar & Perencanaan Transportasi | 2 |\n| 5 | PWK21W0305 | Perencanaan Kota | 3 |\n| 6 | PWK21W0306 | Ekonomi Wilayah & Kota | 2 |\n| 7 | PWK21W0307 | Sistem Informasi Perencanaan | 3 |\n| 8 | PWK21W0308 | Tata Ruang Berbasis Kearifan Lokal | 2 |\n| Jumlah SKS | Jumlah SKS | Jumlah SKS | 19 |\n\n<div align=\"center\">\n\nSemester IV"
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 0.6667,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 0.8
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Wadek1-Buku Panduan Akademik FT Unpas 2023-2024 Publish.pdf",
+        "difficulty": "easy",
+        "reasoning_type": "single-hop",
+        "noise_level": "medium",
+        "original_id": "ragas_q3",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "simple",
+        "topic": "sks",
+        "source_doc_ids": [],
+        "reference_corrected": true
+      }
+    },
+    {
+      "id": "d1-04",
+      "user_input": "Kak, kalau ketahuan nyontek pas ujian itu masuk pelanggaran apa ya, sanksinya apa?",
+      "reference": "Menyontek pada saat ujian dikategorikan sebagai pelanggaran akademik ringan. Sanksi yang diberikan untuk pelanggaran ringan adalah diberikannya surat peringatan kepada mahasiswa yang bersangkutan.",
+      "response": "Berdasarkan dokumen, nyontek pada saat ujian termasuk ke dalam **pelanggaran ringan** [1]. Sanksi untuk pelanggaran ringan adalah **diberikannya surat peringatan** [4].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "Jenis pelanggaran yang dilakukan oleh mahasiswa dibagi menjadi tiga, yakni ringan, sedang, dan berat. Yang termasuk kategori pelanggaran ringan adalah\n- Nyontek pada saat ujian\n- Copas tugas teman pada saat mengumpulkan tugas\n- Turut serta membantu terjadinya nyontek atau copy paste\n- Melakukan cyberbullying, pencemaran nama baik kampus atau orang lain secara online, pelanggaran data privasi yang dilaporkan oleh pihak yang dirugikan\n- Melakukan penghinaan atau diskriminasi ras secara terbuka yang dilaporkan oleh pihak yang dirugikan\n## Yang termasuk kategori pelanggaran sedang adalah\n- Pelanggaran ringan yang diulang lebih dari tiga kali\n- pemalsuan kehadiran mahasiswa di kelas\n- Pemalsuan bukti ijin / sakit untuk dicatatkan pada kehadiran mahasiswa dikelas\n- Membantu atau turut serta dalam pemalsuan kehadiran\n- Pemalsuan dokumen bukti persyaratan akademik ( bukti pembayaran dpp, memo dari pihak yang berwenang)\n- Pemalsuan hasil perwalian",
+        "2. Ngebut, boncengan lebih dari dua orang, membuka saringan knalpot sehingga mengakibatkan kebisingan dan menggangu ketenangan serta kenyamanan kegiatan akademik, serta meletakan kendaraan tidak ditempat parker yang telah ditentukan.\n3. Menggunakan kantor seketariat di luar batas yang ditetapkan, kecuali memperoleh izin dari Universitas Pasundan Bandung, menggunakan kantor skretariat sebagai tempat menginap, memasak, mencuci, menjemur pakaian, dan aktivitas rumah tangga lainnya, serta menempelkan brosur-brosur di sembarang tempat.\n4. Saat mengikuti perkuliahan: masuk ruang kuliah terlambat, tanpa izin dan mengucap salam, mengobrol dalam ruangan saat perkuliahan sedang berlangsung, dan/atau duduk berdampingan laki-laki dan perempuan, serta membawa catetan dan menyontek ketika ujian belangsung.\n5. Melakukan kecurangan akademik dalam bentuk plagiat, praktek perjokian, memalsukan nilai, tanda tangan dan surat keterangan yang berkaitan dengan akademik, administrasi maupun kemahasiswaan.",
+        "menggunakan kantor skretariat sebagai tempat menginap, memasak, mencuci, menjemur pakaian, dan aktivitas rumah tangga lainnya, serta menempelkan brosur-brosur di sembarang tempat, Saat mengikuti perkuliahan masuk ruang kuliah terlambat, tanpa izin dan mengucap salam, mengobrol dalam ruangan saat perkuliahan sedang berlangsung, dan/atau duduk berdampingan laki-laki dan perempuan, serta membawa catetan dan menyontek ketika ujian belangsung.",
+        "- Membantu atau turut serta dalam pemalsuan kehadiran\n- Pemalsuan dokumen bukti persyaratan akademik ( bukti pembayaran dpp, memo dari pihak yang berwenang)\n- Pemalsuan hasil perwalian\n- Pelanggaran lainnya yang berkaitan dengan proses penyelenggaraan kegiatan akademik\n## Yang termasuk kategori pelanggaran berat adalah\n- Pelanggaran sedang yang diulang lebih dari 3 kali\n- Menjadi joki atau meminta orang lain menjadi joki untuk ujiannya.\n- Pemalsuan nilai ujian\n- Pelakukan plagiarisme pada laporan skripsi/project/tugas akhir/ publikasi ilmiah\n- Menggunakan narkoba\n- Melakukan tindakan asusila\n## Sanksi\n1. Untuk pelanggaran ringan sanksinya adalah diberikannya surat peringatan\n2. Untuk pelangaran sedang sanksinya mulai dari mendapatkan nilai E pada mata kuliah tertentu sampai dengan skorsing paling lama 2 semester\n3. Untuk pelanggaran berat dikenakan sanksi skorsing perkuliahan maksimal 4 semester.",
+        "2. Sanksi sedang: (1) Pencabutan hak mengikuti semua kegiatan akademik selama 1 (satu) semester. (2). Pembatalan hasil ujian untuk mata kuliah tertentu, atau seluruh mata kuliah dalam 1 (satu) semester. (3) Penangguhan ijazah/transkip nilai dan/atau skorsing selama satu semester, dan membuat surat pernyataan secara tertulis tidak akan mengulangi pelanggaran serupa. (4). Bentuk sanksi lain yang dipandang sesuai oleh Dewan Kehormatan Tata Tertib dan Etika Akademik Universitas Pasundan Bandung.\n3. Sanksi berat : diserahkan kasusnya kepada pihak berewajib sesuai dengan Hukum dan Perundang - undangan yang berlaku.\n## BAB VII\n## PIHAK YANG BERWENANG MENJATUHKAN SANKSI Pasal 9\nPihak yang berwenang menjatuhkan sanksi adalah :\n1. Ketua jurusan/prodi, dosen atau pegawai/karyawan untuk sanksi ringan atas pelanggaran tata tertib mahasiswa.\n2. Dekan Faklutas, Direktur Program Pascasarjana untuk sanksi sedang atas pelanggaran tata tertib mahasiswa.",
+        "## IV.9.2. Pelanggaran dan Sanksi Akademik\n## IV.9.2.1. Sanksi Akademik\nSanksi akademik dimaksudkan untuk memelihara hasil pendidikan dan mendorong mahasiswa untuk mencapai prestasi yang optimal. Pada dasarnya setiap pelanggaran terhadap peraturan yang berlaku di Fakultas Teknik akan mendapatkan sanksi sesuai dengan jenis pelanggarannya. Pemberian sanksi akademik tersebut merupakan penjabaran dari Undang Undang No. 2 tahun 2012 tentang Sistem Pendidikan Nasional, dan menunjukan keseriusan fakultas dalam mengemban tugas menyelenggarakan pendidikan dan pengajaran. Sanksi akademik bagi mahasiswa merupakan tindak lanjut yang diberikan pada setiap bentuk pelanggaran akademik yang dilakukan oleh mahasiswa.\nPelanggaran akademik adalah pelanggaran yang dilakukan oleh mahasiswa terhadap keabsahan hasil penyelenggaraan kegiatan akademik mulai dari perwalian hingga telah diumumkan hasil ujian.\n## IV.9.2.2. Pelanggaran Akademik\n## Maksud pelanggaran akademik adalah",
+        "Perguruan tinggi memberikan sanksi atas semua bentuk pelanggaran yang dilakukan terhadap ketentuan-ketentuan yang telah ditetapkan baik secara individu maupun organisasi. Penjatuhan sanksi dilakukan melalui mekanisme yang adil, transparan, objektif, dan bertujuan mendidik. Sanksi didasarkan pada hasil evaluasi yang dilakukan oleh pihak internal dan/atau eksternal, dapat berupa sanksi administrasi, peringatan lisan, peringatan tertulis, skorsing dan pemberhentian pada individu, pembekuan kegiatan, pembekuan sementara organisasi, hingga pembubaran organisasi secara permanen, yang diatur di dalam peraturan perguruan tinggi dan perundang-undangan yang berlaku\n\n<div align=\"center\">\n\n# VIII. ORGANISASI DAN LEMBAGA KEMAHASISWAAN",
+        "## BAB VI\n## SANKSI\n## Pasal 8\nSanksi terhadap pelanggaran tata tertib ini ditetapkan sebagai berikut :\n1. Sanksi ringan : (1) Teguran lisan dan tulisan. (2). Ganti rugi atas barang yang rusak atau hilang. (3). Dikeluarkan dari kegiatan kuliah atau ujian. (4). Tidak diberikan pelayanan administrasi dan akademik selama 1 (satu) bulan Dewan Kehormatan Tata Tertib dan Etika Akademik Universitas Pasundan Bandung.",
+        "2. Pelanggaran sedang adalah pelanggaran terhadap tata tertib yang dapat menimbulkan kerugian moral dan material bagi Universitas Pasundan Bandung, di antaranya: Melakukan kecurangan akademik dalam bentuk plagiat, praktek perjokian, memalsukan nilai, tanda tangan dan surat keterangan yang berkaitan dengan akademik, administrasi maupun kemahasiswaan.",
+        "## IV.9.2.2. Pelanggaran Akademik\n## Maksud pelanggaran akademik adalah\n- jika mahasiswa tersebut melakukan pelanggaran terhadap keabsahan persyaratan dan hasil proses penyelenggaraan kegiatan akademik mulai dari perwalian hingga diumumkannya hasil ujian, baik ujian tengah semester, ujian akhir, maupun hasil skripsi/tugas akhir/project/publikasi ilmiah.\n- Jika mahasiswa melanggar norma kehidupan di kampus atau melanggar hukum\nProses penyelenggaraan kegiatan akademik terdiri dari :\n- Perwalian\n- Perkuliahan\n- Pendaftaran Ujian\n- Pelaksanaan Ujian\n- Hasil ujian\n- Kerja Praktek\n- Tugas Akhir /Skripsi / Project Capstone Desain/ Publikasi Ilmiah\n## Persyaratan kegiatan akademik antara lain terdiri dari :\n- Tanda bukti pembayaran SPP.\n- Surat-surat pengantar untuk mendukung terselenggaranya kegiatan akademik.\n- Rekomendasi dari pihak-pihak yang berwenang untuk mendukung kegiatan akademik.\n- Persyaratan lain-lain yang berhubungan dengan kegiatan akademik."
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 1.0,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 0.8
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Wadek1-Buku Panduan Akademik FT Unpas 2023-2024 Publish.pdf",
+        "difficulty": "easy",
+        "reasoning_type": "multi-hop",
+        "noise_level": "low",
+        "original_id": "ragas_q4",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "multi_doc",
+        "topic": "ujian",
+        "source_doc_ids": []
+      }
+    },
+    {
+      "id": "d1-05",
+      "user_input": "Syarat buat ikut ujian susulan gimana min? Kalo telat 5 hari ngajuinnya masih bisa ga?",
+      "reference": "Mahasiswa tidak dapat mengikuti ujian susulan jika terlambat 5 hari, karena persyaratan ujian susulan wajib dimasukkan ke Piket Ujian atau Sub Bagian Akademik Fakultas paling lambat 2 hari setelah pelaksanaan ujian mata kuliah tersebut.",
+      "response": "Berdasarkan dokumen, syarat untuk mengikuti ujian susulan adalah sebagai berikut:\n\n1. Mahasiswa harus memiliki alasan yang sah, seperti: sedang dirawat/inap dengan surat keterangan dari rumah sakit [3], mendapat tugas dari instansi terkait (misal Pelatnas/utusan negara, pelatda/utusan daerah) [3], mendapat musibah meninggal dunia sebagai ahli waris dengan surat keterangan dari yang berwenang [3], akan menunaikan ibadah haji dengan surat keterangan dari Kandepag [3], atau saatnya waktu melahirkan [3].\n2. Persyaratan ujian susulan harus dimasukkan ke Piket Ujian atau Sub Bagian Akademik Fakultas Teknik paling lambat 2 (dua) hari setelah pelaksanaan mata kuliah tersebut diujikan [1]. Di luar jadwal yang ditentukan oleh Wakil Dekan I, izin ujian susulan tidak akan diberikan [3].\n\nMengenai pertanyaan Anda, jika Anda telat 5 hari mengajukan, maka hal tersebut **tidak bisa** karena batas waktu pengajuan adalah paling lambat 2 hari setelah ujian dilaksanakan [1].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "## Prosedur Ujian Susulan, adalah sebagai berikut :\n1. Mahasiswa memasukkan persyaratan Ujian Susulan ke Piket Ujian atau Sub Bagian Akademik Fakultas Teknik paling lambat 2 (dua) hari setelah pelaksanaan mata kuliah tersebut diujikan.\n2. Mahasiswa megikuti ujian susulan pada jadual yang telah ditentukan paling lambat 2 minggu setelah ujian berlangsung.",
+        "## IV.3.2. Ujian Akhir Semeaster (UAS)\nUjian Akhir Semester adalah ujian yang dilakukan untuk mengevaluasi penguasaan CPMK yang belum diujikan di masa UTS maupun selama perkuliahan\nUntuk dapat mengikuti UAS dari tiap matakuliah setiap mahasiswa harus memenuhi syarat-syarat:\na. Telah menyelesaikan administrasi keuangan (DPP/SPP) 100 %.\nb. Telah terlibat dalam perkuliahan sekurang-kurangnya 75 % dari sesi yang telah diselenggarakan oleh dosen kelas masing-masing pada semester yang bersangkutan.\n## IV.3.3. Ujian Susulan\nUjian Susulan diberikan izin oleh Wakil Dekan I, dengan persyaratan :\n- Mahasiswa yang pada jadwal ujian mata kuliah diujikan, sedang dirawat/inap ada surat keterangan dari rumah sakit.",
+        "- Mahasiswa yang pada jadwal ujian mata kuliah diujikan mendapat tugas dari instansi terkait, karena menunaikan tugas daerah/negara, misal Pelatnas/utusan negara, pelatda/utusan daerah, dan lain-lain.\n- Mahasiswa (sebagai ahli waris) yang pada jadwal ujian mata kuliah diujikan mendapat musibah meninggal dunia, yang dikuatkan dengan surat keterangan dari yang berwenang.\n- Mahasiswa yang pada jadwal ujian mata kuliah diujikan akan menunaikan ibadah haji dengan memberikan surat keterangan dari Kandepag.\n- Mahasiswa yang pada jadwal ujian mata kuliah diujikan, saatnya waktu melahirkan.\n- Memasukkan persyaratan ujian susulan ke Piket Ujian atau Sub Bagian Akademik Fakultas Teknik pada jadwal yang telah ditentukan oleh Wakil Dekan I, di luar jadwal itu maka izin ujian susulan tidak akan diberikan.\n## Prosedur Ujian Susulan, adalah sebagai berikut :",
+        "iii. Membuka SITU 2.0 Modul CBT, tunggu sampai soal ujian bisa dibuka\niv. Klik MULAI UJIAN\nv. Mengerjakan Ujian :\na. Jika jawaban dientry di CBT , bentuk PG /Essay Teks maka masukkan jawaban di CBT\nb. Jika jawaban ditulis dikertas, bentuk essay, maka pengawas akan membagikan kertas jawaban dan tulis jawaban Anda di kertas yang dibagikan\nvi. Pastikan menandatangani daftar hadir yang diedarkan pengawas karena itu merupakan bukti kuat Anda mengikuti UTS\nvii. Mengakhiri Ujian\na. jawaban dientry di CBT , maka dipersilahkan keluar jika sudah selesai\nb. jawaban dilakukan di kertas, maka letakkan jawaban di kursi Anda dalam keadaan tertutup, lalu meninggalkan ruangan\n## Jika Terlambat\n1. Langsung ke Lokasi ujian. Temui Petugas yang akan memeriksa apakah Anda sudah Mulai Ujian di CBT\n2. Jika CBT akun Anda SUDAH terbuka, maka Anda dinyatakan Diskualifikasi / gugur\n3. Jika CBT akun Anda BELUM terbuka, maka Anda akan dipersilahkan untuk masuk ke ruangan dan melaksanakan UTS di sisa waktu yang ada",
+        "</div>\n| Unsur Nilai | Persentase |\n| --- | --- |\n| TUGAS INDIVIDU | 20.00% |\n| UTS | 30.00% |\n| UAS | 30.00% |\n| Keterlibatan | 20.00% |\n| KEHADIRAN | 50.00% |\n| Aktivitas di LMS | 50.00% |\n| TOTAL | 100% |\n| TOTAL | 100% |\n## IV.3.1. Ujian Tengah Semester (UTS)\nUjian Tengah Semester adalah ujian yang dilakukan untuk mengevaluasi penguasaan CPMK ( Capaian Pembelajaran Mata Kuliah) selama kurun 1/2 (setengah) semester proses pembelajaran. Sebuah kelas untuk mata kuliah tertentu bisa diselenggarakan UTS jika jumlah pertemuan minimal 5 kali.\nUntuk dapat mengikuti UTS dari tiap matakuliah setiap mahasiswa harus memenuhi syarat-syarat :\na. Telah menyelesaikan administrasi keuangan (DPP/SPP) 50 %.\nb. Telah terlibat dalam perkuliahan sekurang-kurangnya 75 % dari sesi dan aktivitas yang telah diselenggarakan oleh dosen kelas masing-masing pada semester yang bersangkutan.\n## IV.3.2. Ujian Akhir Semeaster (UAS)",
+        "Catatan: Panitia harus mengajukan proposal paling lambat 7 hari kerja sebelum kegiatan dilaksanakan karena seluruh proses persetujuan pengajuan kegiatan memerlukan waktu 5 hari kerja.",
+        "## Petunjuk Teknis UTS Genap 2024/2025 di Lingkungan FT UNPAS untuk Mahasiswa\n## Petunjuk Umum\n1. Pernyataan seorang mahasiswa mengikuti UTS adalah jika (1) hadir ONSITE DAN (2)mengerjakan soal ujian sesuai petunjuk dalam soal. Jika seorang mahasiswa mengerjakan soal PG di CBT di luar ruang ujian, maka status nilai UTS nya akan tetap #NA ( not available).\n2. Pastikan Anda sudah bisa masuk ke ruang ujian online di CBT sebelum tiba jadwal ujian\n3. UTS onsite dilaksanakan di tiga Lokasi dalam kampus Unpas Setiabudi, yakni a) Aula Otto Iskandar Dinata b) Ruang kuliah di area Parkir ( SB 106-SB108) c) Gedung A lantai 4\n4. Gunakan perangkat akses smartphone atau laptop dengan baterei yang memadai untuk 2 jam\n5. Siapkan juga alat tulis dan penghapus untuk mengerjakan ujian di lembar jawaban\n6. Untuk ujian yang bersifat buka buku, siapkan contekan dalam bentuk kertas atau fotocopy bahan ajar yang diberikan dosen atau membawa buku yang menjadi referensi mata kuliah\n7. Larangan",
+        "3. Jika CBT akun Anda BELUM terbuka, maka Anda akan dipersilahkan untuk masuk ke ruangan dan melaksanakan UTS di sisa waktu yang ada\n## Jika Tidak Bisa Hadir UTS karena (sakit dg surat dokter, ibadah haji/umroh, ada sdr yang meninggal)\n1. Hubungi petugas di sekretariat ( Pak Gilang dan Bu Heni Puspita) maksimal 3 hari setelah jadwal Ujian\nTTD\nKetua Ganjir Ujian\nFAKULTAS TEKNIK",
+        "3. Keberatan sebagaimana dimaksud dalam ayat 1 dan 2 harus diajukan secara tertulis oleh mahasiswa yang bersangkutan dalam jangka waktu 7 hari sejak siterimanya surat keputusan.\n4. Dalam jangka waktu 14 hari kerja sejak rektor/dekan wajib memberikan jawaban akhir.\n5. Apabila jangka waktu sebagaimana tercantum dalam ayat 4 telah lewat dan rektor/dekan belum memberikan jawaban akhir, maka keberatan dianggap dikabulkan.\n## Pasal 16\n1. Dalam hal keputusan rektor/dekan sebagaimana dimaksud dalam pasal 15 menyangkut nama baik mahasiswa, maka disamping memberikan jawaban akhir diwajibkan pula menyatakan rehabilitasi apabila keberatan dari mahasiswa diterima.\n2. Pemberian rehabilitasi sebagaimana dimaksud dalam ayat 1 disampaikan kepada pejabat/lembaga yang terkait.\n## BAB XI\n## KETENTUAN KHUSUS DAN PENUTUP Pasal 17\nRektor selaku pimpinan tertinggi Universitas Pasundan dapat mengambil langkah langkah kebijakan khusus sebagai berikut :\na. Menghentikan proses pemeriksaan pada semua tingkatan",
+        "IV.2. Perkuliahan ... 65\n\nIV.2.1. Bentuk Perkuliahan ... 65\n\nIV.2.2. Standar Perkuliahan BLENDED ... 65\n\nIV.2.3. Frekuensi Perkuliahan ... 66\n\nIV.2.4. LMS Platform Perkuliahan ... 67\n\nIV.3. Penilaian ... 68\n\nIV.3.1. Ujian Tengah Semester (UTS) ... 69\n\nIV.3.2. Ujian Akhir Semeaster (UAS) ... 69\n\nIV.3.3. Ujian Susulan ... 69\n\nIV.3.4. Evaluasi Keberhasilan Studi ... 70\n\nIV.3.5. SKPM sebagai Lampiran SKPI ... 73\n\nIV.4. Mata Kuliah Kerja Praktek (KP) ... 74\n\nIV.5. Tugas Akhir / Skripsi/ Project Capstone Design / Publikasi Ilmiah (TSPP) ... 75\n\nIV.6. Yudisium ... 77\n\nIV.7. Wisuda ... 78\n\nIV.8. Ijazah , Transkrip, dan SKPI ... 79\n\nIV.9. Aturan Akademik Yang Perlu Diperhatikan ... 79\n\nIV.9.1. Cuti Akademik ... 79\n\nIV.9.2. Pelanggaran dan Sanksi Akademik ... 83\n\nIV.9.3. Evaluasi Kinerja akademik dan Eksekusi Akhir Masa Studi ... 85\n\nIV.9.4. Program MBKM Di Lingkungan Fakultas Teknik ... 85\n\nV. LABORATORIUM dan SARANA PENDUKUNG LAINNYA ... 88\n\nV.1. Laboratorium ... 88"
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 1.0,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 0.33
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Wadek1-Buku Panduan Akademik FT Unpas 2023-2024 Publish.pdf",
+        "difficulty": "medium",
+        "reasoning_type": "inference",
+        "noise_level": "medium",
+        "original_id": "ragas_q5",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "conditional",
+        "topic": "ujian",
+        "source_doc_ids": []
+      }
+    },
+    {
+      "id": "d1-06",
+      "user_input": "Apa bedanya Fully MBKM sama Partially MBKM kak?",
+      "reference": "Fully MBKM berarti mahasiswa melakukan semua kegiatan belajar di luar kampus selama satu semester penuh dan berhak atas konversi 20 SKS. Sementara Partially MBKM berarti mahasiswa membagi kegiatan belajar di luar kampus dengan kegiatan perkuliahan di dalam kampus, sehingga SKS yang diambil merupakan campuran dari konversi MBKM dan KRS reguler.",
+      "response": "**Fully MBKM**: Mahasiswa dalam satu semester melakukan semua kegiatan belajar di luar kampus dan berhak mendapatkan konversi 20 sks [1].  \n**Partially MBKM**: Selain melakukan kegiatan belajar di luar kampus juga melakukan kegiatan PBM di dalam kampus. SKS yang diambil di semester adalah campuran antara konversi MBKM dan KRS reguler [1].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "## c) MBKM Mandiri oleh mahasiswa dibiayai oleh orang tua mahasiswa\nDari sisi pelaksanaan, kegiatan MBKM dibagi menjadi 2 yakni full time MBKM dan partial MBKM.\nf) Fully MBKM, mahasiswa dalam satu semester melakukan semua kegiatan belajar diluar kampus dan berhak mendapatkan konversi 20 sks\ng) Partially MBKM, selain melakukan kegiatan belajar di luar kampus juga melakukan kegiatan PBM di dalam kampus. SKS yang diambil di semester adalah campuran antara konversi MBKM dan KRS reguler\nPersyaratan umum mahasiswa mengikuti MBKM adalah\nh) Sudah melalui semester 4\ni) Sks lulus minimal 70\nj) Ipk minimal 3.0\nk) Akumulasi SKS konversi pada MBKM yang diikuti sebelumnya masih kurang dari 30 sks. Maksimal bisa dikonversi untuk semua MBKM yang dilakukan adalah 40 sks\nPersyaratan khususnya adalah\na) Diijinkan oleh pimpinan prodi\nb) Status mahasiswa pada saat mengajukan MBKM adalah aktif\nc) Mahasiswa menyetujui estimasi mata kuliah yang akan dikonversi",
+        "2. Persetujuan Pimpinan Prodi dan KSBAP memastikan status semester mahasiswa adalah kampus merdeka\n3. Pengalokasian Pembimbing oleh Pimpinan Prodi\n4. Pelaksanaan dan Pemantauan melalui pengisian log book di SITU 2.0 yang diaapprove oleh dosen pembimbing\n5. Penilaian dan Konversi (cek pada KHS , bahwa nilai konversi sudah masuk)\n6. Penerbitan Sertifikat MBKM\nAlur kegiatan Partially MBKM adalah sebagai berikut\n1) Aksi 1-6 pada bagian fully MBKM ditambah dengan\n2) Mengisi KRS\n3) Persetujuan KRS oleh Pimpinan Prodi yang menjamin bahwa total SKS reguler dan SKS konversi dari MBKM tidak lebih dari 24",
+        "## II.4. Program Studi Teknik Informatika\nProdi Teknik Informatika Universitas Pasundan, berdiri tahun 1993 dengan SK Pendirian No 122/D/O/1993. Dalam kurun 1993-2023, Prodi TIF Unpas saat ini telah meraih kepercayaan dari masyarakat melalui Akreditasi Internasional IABEE kategori PA dan Akreditasi Nasional dari BAN PT dengan peringkat B.\nDari sisi kurikulum, pembelajaran, dan suasana akademik; Prodi Teknik Informatika Unpas telah melakukan penyesuaian kurikulum sesuai dengan Kurikulum Perguruan Tinggi (KPT) yang mengacu pada KKNI dan SNDIKTI. Masukan untuk kurikulum dari stakeholder terkait, termasuk juga mengacu kepada asosiasi Aptikom dan Computing Curricula dari ACM. Pada tahun 2021 ini, Prodi Teknik Informatika mengikuti kegiatan Merdeka Belajar- Kampus Merdeka (MBKM) dengan berbagai penyesuaian kurikulum.",
+        "3. Mahasiswa yang dengan capaian SKS lulus dan sisa jatah waktu studinya yang masih tersisa tidak memungkinkan untuk bisa lulus pendidikan sarjana, yakni\na. Akhir Tahun ke V, sks lulus <=48\nb. Akhir tahun ke VI, sks lulus < 96\n## IV.9.4. Program MBKM Di Lingkungan Fakultas Teknik\nSemua Prodi di lingkungan Fakultas Teknik telah merancang bentuk-bentuk kegiatan MBKM yang ditawarkan, juga telah bekerja sama dengan mitra, serta merancang konversi / rekognisi kegiatan MBKM ke dalam SKS mata kuliah dalam kurikulum.\nDari sisi pembaiyaan kegiatan MBKM diklasifikasi menjadi 3, yakni\na) MBKM yang ditawarkan KEMENDIKBUD DIKTI , dibiayai DIKTI\nb) MBKM Mandiri yang ditawarkan oleh lembaga di UNPAS atau Prodi, dibiayai Unpas",
+        "a) Pertukaran Pelajar\nb) Magang\nc) Studi Independent\nd) Wirausaha\ne) KKN Bina Desa\nAlur kegiatan Fully MBKM adalah sebagai berikut\n1. Mengajukan (untuk MBKM DIKTI dan Mandiri ) atau mendaftar pada lowongan yang dipasang prodi/ unit lain (untuk MBKM Mandiri Unpas) melalui modul MBKM di SITU 2.0 berikut rencana mata kuliah yang akan dikonversi",
+        "Berbagai dokumen dan standard dijadikan acuan dalam penyusunan kurikulum. Akan tetapi Prodi Informatika tidak melepaskan jati diri sebagai bagian dari keluarga Paguyuban Pasundan; dimana profil lulusan tetap mempertahankan aspek kesundaan dan keislaman. Prodi Informatika juga tetap mengemban amanah negara yang tertuang dalam Permendikbud tahun 2020, tentang SNPT. Karena itu, kurikulum memuat mata kuliah wajib negara dan juga mata kuliah wajib Unpas. Keseluruhannya diseleraskan dengan Kebutuhan kegiatan MBKM. Semoga tersusunnya dokumen kurikulum ini dapat menjadi dasar bagi peningkatan kompetensi mahasiswa prodi Teknik Informatika Fakultas Teknik Universitas Pasundan.",
+        "Persyaratan khususnya adalah\na) Diijinkan oleh pimpinan prodi\nb) Status mahasiswa pada saat mengajukan MBKM adalah aktif\nc) Mahasiswa menyetujui estimasi mata kuliah yang akan dikonversi\nd) Untuk MBKM yang dibiayai Kemdikbud DIKTI dan MBKM Mandiri Unpas ( dibiayai Unpas), mahasiswa bersedia menerima konsekuensi yang ditetapkan, diantaranya adalah mengembalikan dana yang sudah diterima dan dipakai jika tidak menunjukkan performansi yang ditetapkan\nKarena syarat semua kepesertaan MBKM adalah mahasiswa tersebut harus aktif, maka artinya mahasiswa harus melakukan registrasi dan pembayaran di semester dia mengikuti MBKM tersebut.\nBentuk kegiatan MBKM mandiri yang ditawarkan oleh Prodi di lingkungan FT, minimal adalah\na) Pertukaran Pelajar\nb) Magang\nc) Studi Independent\nd) Wirausaha\ne) KKN Bina Desa\nAlur kegiatan Fully MBKM adalah sebagai berikut",
+        "Contoh 2: Jika MK Praktikum di semester Genap 2021/2022, maksimal koreksi nilai dilakukan pada Semester Ganjil 2022/2023.\n## 4. Penyetaraan Nilai Praktikum Program MBKM\nBagi mahasiswa yang mengikuti program MBKM yang setara dengan Matakuliah Praktikum, maka tidak perlu mengikuti kegiatan belajar mengajar di Lab TIF. Nilai dari program MBKM akan disetarakan dengan matakuliah tersebut.\n## 5. Registrasi Pasundan Mail\nMahasiswa Unpas berhak mendapatkan fasilitas email dengan basis Gmail dari Google yang disebut Pasundan Mail (PasMail). Akun email ini setara dengan Gmail Bisnis dan dengan kapasitas penyimpanan tak terbatas (unlimitted) merupakan kerjasama langsung Teknik Informatika dengan Google sejak 2011. Alamat PasMail mahasiswa ini menggunakan subdomain @mail.unpas.ac.id. Untuk Prodi Teknik Informatika, pendaftaran bisa dilakukan melalui Lab TIF.\n## 6. Registrasi Akses Internet TIF",
+        "## 8 Implementasi Hak Belajar Mahasiswa Maksimum 3 Semester\n## 8.1 Model implementasi MBKM\n| No | MK | SKS | Penyetaraan Paket MBKM Prodi |\n| --- | --- | --- | --- |\n| Semester 3 | Semester 3 | Semester 3 | Pertukaran Pelajar (UUM) |\n| 1 | Matematika Informatika II | 3 | √ |\n| 2 | Algoritma dan Pemograman II | 3 | √ |\n| 3 | Rekayasa Perangkat Lunak | 3 | √ |\n| 4 | Praktikum Basis Data | 2 | √ |\n| 5 | Infrastruktur Pendukung Aplikasi | 2 | √ |\n| 6 | Praktikum Infrastruktur | 1 |  |\n| 7 | Organisasi & Proses Bisnis | 2 | √ |\n| 8 | Kewarganegaraan | 2 |  |\n| No | MK | SKS | Penyetaraan Paket MBKM Prodi |\n| --- | --- | --- | --- |\n| Semester 4 | Semester 4 | Semester 4 | Pertukaran Pelajar (UUM) |\n| 1 | Pemograman Berorientasi Objek | 3 | √ |\n| 2 | Interaksi Manusia dan Komputer | 3 | √ |\n| 3 | Teori Komputasi | 2 | √ |\n| 4 | Praktikum Pemograman I | 2 | √ |\n| 5 | Sistem Manajemen Basis Data | 3 | √ |\n| 6 | Sistem Informasi | 3 | √ |\n| 7 | Praktikum Multimedia | 2 | √ |",
+        "UNIVERSITAS PASUNDAN"
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 1.0,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 1.0
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Wadek1-Buku Panduan Akademik FT Unpas 2023-2024 Publish.pdf",
+        "difficulty": "medium",
+        "reasoning_type": "comparison",
+        "noise_level": "low",
+        "original_id": "ragas_q6",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "multi_doc",
+        "topic": "mbkm",
+        "source_doc_ids": []
+      }
+    },
+    {
+      "id": "d1-07",
+      "user_input": "Min, kalau aku udah 4 semester berturut-turut nggak aktif kuliah, apa langsung di-DO?",
+      "reference": "Mahasiswa yang tidak aktif selama 4 semester berturut-turut akan dieksekusi akhir masa studi (dikeluarkan/DO) melalui SK Rektor. Penetapannya akan dilakukan pada saat awal semester ke-5 saat mahasiswa tersebut tidak aktif.",
+      "response": "Berdasarkan informasi yang tersedia, eksekusi akhir masa studi (penetapan status mengundurkan diri/keluar melalui SK Rektor) dilakukan terhadap mahasiswa yang tidak aktif selama 4 semester berturut-turut, dan penetapan tersebut dilakukan pada saat awal semester ke-5 mahasiswa tersebut tidak aktif [1].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "Mahasiswa yang terkena evaluasi oleh Program Studi meliputi tahap sebagai berikut:\na. Tahap I Mahasiswa pada Akhir Tahun Akademik II :\n$$\n\\mathrm {I P K} < = 2, 0; \\mathrm {S K S} < = 4 0\n$$\nb. Tahap II Mahasiswa pada Akhir Tahun IV IPK <= 2,0; SKS <= 90\nc. Tahap III Mahasiswa pada Akhir Tahun VI IPK <= 2,0; SKS <= 130\nd. Reguler setiap awal tahun akademik jika tiga semester berturut-turut tidak aktif\nEksekusi akhir masa studi adalah penetapan status akademik seorang mahasiswa dinyatakan mengundurkan diri/ keluar melalui SK Rektor. Eksekusi akhir masa studi dilakukan terhadap\n1. Mahasiswa yang tidak aktif selama 4 semester berturut-tutur , penetapan dilakukan pada saat awal semester ke 5 ybs tidak aktif\n2. Mahasiswa yang sampai pada akhir semester 14 belum dinyatakan lulus (30 September)\n3. Mahasiswa yang dengan capaian SKS lulus dan sisa jatah waktu studinya yang masih tersisa tidak memungkinkan untuk bisa lulus pendidikan sarjana, yakni\na. Akhir Tahun ke V, sks lulus <=48",
+        "<div align=\"center\">\n\n# PROSEDUR PERMOHONAN\n\nAKTIF AKADEMIK\n\n</div>\nMahasiswa mengajukan permohonan Aktif Kuliah kembali kepada BAA dengan menyerahkan Surat Keputusan Rektor mengenai Cuti Akademik\nMahasiswa menunggu proses permohonan Aktif Akademik yang akan diproses oleh BAA dan Rektor\n3 Rektor menembuskan Surat Keputusan pengaktifan kembali mahasiswa kepada Wadek 1\nMahasiswa melaporkan kepada Wadek 1 dan Wadek 2 untuk Aktif Kuliah kembali dengan membawa Surat Keputusan Rektor mengenai Aktif Kuliah kembali\n5 Wadek 1 meneruskan permohonan Aktif Kuliah kembali kepada Ketua Prodi\n6 Ketua Prodi menyetujui dan mendata kembali Mahasiswa yang aktif kuliah kembali\n7 Mahasiswa Aktif Kuliah kembali",
+        "e) Biaya untuk pengurusan ketiga dokumen tersebut sudah masuk ke biaya BPA2DK mulai angkatan 2022\n## IV.9. Aturan Akademik Yang Perlu Diperhatikan\n## IV.9.1. Cuti Akademik\nBagi mahasiswa yang karena sesuatu hal tidak dapat mengikuti kuliah dalam waktu yang cukup lama, maka dapat mengajukan untuk meninggalkan studi sementara waktu (cuti akademik). Yang dimaksud dengan cuti akademik adalah pembebasan mahasiswa dari kewajiban mengikuti kegiatan akademik/kuliah selama jangka waktu tertentu karena alasan-alasan yang dapat dipertanggungjawabkan (sakit, kewajiban sosial, kewajiban pekerjaan, perkembangan diri).\nBerikut peraturan rinci terkait cuti akademik:\na. Cuti akademik, minimal satu tahun akademik dan maksimal 2 tahun akademik\nb. Cuti akademik tidak menambah masa studi . Masa Studi tetap 7 tahun termasuk masa cuti yang diambil.\nc. Tetap berstatus sebagai mahasiswa dan wajib melakukan herregistrasi setiap tahun selama menjalani cuti akademiknya.",
+        "Mahasiswa Data Berhenti Studi Mahasiswa Mahasiswa\n\n</div>\n\n<div align=\"center\">\n\n# PROSEDUR CUTI AKADEMIK\n\n</div>\n## Mahasiswa berkonsultasi dengan Dosen Wali / Konseling\nMahasiswa mengajukan permohonan Cuti kepada Ketua Prodi dengan melampirkan :\n- Surat Permohonan\n- Data Pribadi Mahasiswa\n- Transkip Akademik\n- Pertimbangan dari Dosen Wali / Konseling\n- Bukti Lunas DPP tahun sebelumnya\n## 3 Mahasiswa menunggu surat permohonan Cuti yang akan disetujui oleh Rektor dalam bentuk Surat Keputusan Rektor\nSurat Keputusan Rektor\nMahasiswa membayar uang administrasi ke UNPAS dengan melampirkan Surat keputusan Rektor\n## 5 Mahasiswa menunggu prosedur Cutidiproses oleh pihak Kampus UNPAS\n## 6 Rektor melaporkan kepada Kopertis\n7 Mahasiswa menjalani Cuti Akademik\n\n<div align=\"center\">\n\n# PROSEDUR PERMOHONAN\n\nAKTIF AKADEMIK",
+        "2. Sanksi sedang: (1) Pencabutan hak mengikuti semua kegiatan akademik selama 1 (satu) semester. (2). Pembatalan hasil ujian untuk mata kuliah tertentu, atau seluruh mata kuliah dalam 1 (satu) semester. (3) Penangguhan ijazah/transkip nilai dan/atau skorsing selama satu semester, dan membuat surat pernyataan secara tertulis tidak akan mengulangi pelanggaran serupa. (4). Bentuk sanksi lain yang dipandang sesuai oleh Dewan Kehormatan Tata Tertib dan Etika Akademik Universitas Pasundan Bandung.\n3. Sanksi berat : diserahkan kasusnya kepada pihak berewajib sesuai dengan Hukum dan Perundang - undangan yang berlaku.\n## BAB VII\n## PIHAK YANG BERWENANG MENJATUHKAN SANKSI Pasal 9\nPihak yang berwenang menjatuhkan sanksi adalah :\n1. Ketua jurusan/prodi, dosen atau pegawai/karyawan untuk sanksi ringan atas pelanggaran tata tertib mahasiswa.\n2. Dekan Faklutas, Direktur Program Pascasarjana untuk sanksi sedang atas pelanggaran tata tertib mahasiswa.",
+        "## f. Tidak sedang menjalani sanksi akademis.\nProsedur cuti akademik dan pengajuan aktif kembali dapat dilihat pada gambar dibawah ini.\nTambahan, pada langkah ke 2 surat dan dokumen di satukan di PDF untuk kemudian dilakukan pengajuan secara online melalui SITU 2.0\nKlik Tambah, Isikan ajuan Anda dan upload bundle dokumen yang di dapat dari prodi\n<div align=\"center\">\n\nMahasiswa Data Berhenti Studi Mahasiswa Mahasiswa\n\n</div>\n\n<div align=\"center\">\n\n# PROSEDUR CUTI AKADEMIK",
+        "- Jika mahasiswa peserta kerja praktek sudah melakukan bimbingan dengan pembimbing yang ditunjuk koordinator kerja praktek tapi mahasiswa tidak aktif (tidak bimbingan dan tidak registrasi ulang ke koordinator) minimal 2 semester, maka topik kerja praktek yang bersangkutan dinyatakan kadaluarsa dan harus diganti topik baru.\nSelain prosedur yang diuraikan di atas, setiap Prodi memiliki persyaratan dan tambahan tahapan khusus. Untuk itu pada saat mengambil mata kuliah Kerja Praktek\n## IV.5. Tugas Akhir / Skripsi/ Project Capstone Design / Publikasi Ilmiah (TSPP)",
+        "3. Untuk pelanggaran berat dikenakan sanksi skorsing perkuliahan maksimal 4 semester.\nBagi mahasiswa yang terkena sanksi skorsing, maka jatah maksimum waktu studi bagi mahasiswa tersebut tidak mengalami pemotongan atau masa skorsing tidak mempengaruhi jatah masa studi. Bagi mahasiswa yang terkena sanksi skorsing maka mahasiswa tersebut wajib untuk membayar SPP sesuai dengan besarnya SPP untuk",
+        "## BAB VI\n## SANKSI\n## Pasal 8\nSanksi terhadap pelanggaran tata tertib ini ditetapkan sebagai berikut :\n1. Sanksi ringan : (1) Teguran lisan dan tulisan. (2). Ganti rugi atas barang yang rusak atau hilang. (3). Dikeluarkan dari kegiatan kuliah atau ujian. (4). Tidak diberikan pelayanan administrasi dan akademik selama 1 (satu) bulan Dewan Kehormatan Tata Tertib dan Etika Akademik Universitas Pasundan Bandung.",
+        "c. Tetap berstatus sebagai mahasiswa dan wajib melakukan herregistrasi setiap tahun selama menjalani cuti akademiknya.\nd. Masa pengurusan cuti akademik adalah 1 Juli - 30 September\ne. Biaya administrasi untuk cuti adalah sebesar 5% dari DPP satu tahun\nPermohonan cuti diajukan sebelum semester yang bersangkutan dimulai, oleh mahasiswa untuk diteruskan oleh Program Studi, dan fakultas kepada rektorat. Sebelum dikeluarkan surat ijin cuti, mahasiswa tidak memiliki hak untuk meninggalkan kegiatan akademis di Fakultas Teknik.\nPersyaratan untuk memperoleh surat ijin cuti, adalah :\na. Masih terdaftar sebagai mahasiswa Fakultas Teknik dan telah melunasi DPP tahun terakhir\nb. Tidak berstatus sebagai mahasiswa penerima bea siswa, ikatan tugas dan tugas belajar.\nc. Mendapat persetujuan dari dosen wali, ketua Program Studi dan Dekan\nd. Belum habis masa studi\ne. Telah tedaftar sebagai mahasiswa Fakultas Teknik minimal satu tahun"
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 1.0,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 0.5
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Wadek1-Buku Panduan Akademik FT Unpas 2023-2024 Publish.pdf",
+        "difficulty": "easy",
+        "reasoning_type": "multi-hop",
+        "noise_level": "medium",
+        "original_id": "ragas_q7",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "multi_doc",
+        "topic": "kurikulum",
+        "source_doc_ids": []
+      }
+    },
+    {
+      "id": "d1-08",
+      "user_input": "SKS minimal buat lulus jurusan teknik informatika berapa ya kak? Terus syarat IPK nya berapa?",
+      "reference": "Syarat kelulusan program studi S1 adalah lulus seluruh mata kuliah yang dibebankan dengan total 144 SKS untuk prodi Teknik Informatika, serta memiliki Indeks Prestasi Kumulatif (IPK) minimal 2.0.",
+      "response": "Berdasarkan dokumen, total SKS kurikulum Teknik Informatika adalah 144 SKS [7]. Untuk syarat kelulusan, IPK harus ≥ 2.0 [3].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "Mahasiswa yang terkena evaluasi oleh Program Studi meliputi tahap sebagai berikut:\na. Tahap I Mahasiswa pada Akhir Tahun Akademik II :\n$$\n\\mathrm {I P K} < = 2, 0; \\mathrm {S K S} < = 4 0\n$$\nb. Tahap II Mahasiswa pada Akhir Tahun IV IPK <= 2,0; SKS <= 90\nc. Tahap III Mahasiswa pada Akhir Tahun VI IPK <= 2,0; SKS <= 130\nd. Reguler setiap awal tahun akademik jika tiga semester berturut-turut tidak aktif\nEksekusi akhir masa studi adalah penetapan status akademik seorang mahasiswa dinyatakan mengundurkan diri/ keluar melalui SK Rektor. Eksekusi akhir masa studi dilakukan terhadap\n1. Mahasiswa yang tidak aktif selama 4 semester berturut-tutur , penetapan dilakukan pada saat awal semester ke 5 ybs tidak aktif\n2. Mahasiswa yang sampai pada akhir semester 14 belum dinyatakan lulus (30 September)\n3. Mahasiswa yang dengan capaian SKS lulus dan sisa jatah waktu studinya yang masih tersisa tidak memungkinkan untuk bisa lulus pendidikan sarjana, yakni\na. Akhir Tahun ke V, sks lulus <=48",
+        "## III.4. Program Studi Teknik Informatika\n<div align=\"center\">\n\nSemester I\n\n</div>\n| No | Kode | Matakuliah | Kelompok | SKS |\n| --- | --- | --- | --- | --- |\n| 1 | IF2100101 | Agama | MKU | 2 |\n| 2 | IF2100102 | Literasi Digital | MKU | 2 |\n| 3 | IF2100103 | Matematika Dasar | MKD | 3 |\n| 4 | IF2100104 | Metode Berpikir Komputasi | MKDK | 2 |\n| 5 | IF2100105 | Internet dan Teknologi Web | MKDK | 3 |\n| 6 | IF2100106 | Perancangan Basis Data | MKDK | 3 |\n| 7 | IF2100107 | Infrastruktur Teknologi Informasi | MKDK | 2 |\n| 8 | IF2100108 | Sistem Multimedia | MKDK | 2 |\n| Jumlah SKS | Jumlah SKS | Jumlah SKS | Jumlah SKS | 19 |\n<div align=\"center\">\n\nSemester II",
+        "- Tiap mata kuliah inti harus lulus dengan Nilai Akhir $ \\geq $ C atau sesuai definisi di kurikulum\n- Skripsi harus lulus dengan Nilai akhir $ \\geq $ C\nb. IPK $ \\geq 2. 0 $ dengan ketentuan :\n- Proses perhitungan IPK ini sama dengan proses perhitungan IPs,",
+        "## c) MBKM Mandiri oleh mahasiswa dibiayai oleh orang tua mahasiswa\nDari sisi pelaksanaan, kegiatan MBKM dibagi menjadi 2 yakni full time MBKM dan partial MBKM.\nf) Fully MBKM, mahasiswa dalam satu semester melakukan semua kegiatan belajar diluar kampus dan berhak mendapatkan konversi 20 sks\ng) Partially MBKM, selain melakukan kegiatan belajar di luar kampus juga melakukan kegiatan PBM di dalam kampus. SKS yang diambil di semester adalah campuran antara konversi MBKM dan KRS reguler\nPersyaratan umum mahasiswa mengikuti MBKM adalah\nh) Sudah melalui semester 4\ni) Sks lulus minimal 70\nj) Ipk minimal 3.0\nk) Akumulasi SKS konversi pada MBKM yang diikuti sebelumnya masih kurang dari 30 sks. Maksimal bisa dikonversi untuk semua MBKM yang dilakukan adalah 40 sks\nPersyaratan khususnya adalah\na) Diijinkan oleh pimpinan prodi\nb) Status mahasiswa pada saat mengajukan MBKM adalah aktif\nc) Mahasiswa menyetujui estimasi mata kuliah yang akan dikonversi",
+        "g) Ujian UAS\nh) Penilaian Akhir\ni) Pengisian Kuesioner Evaluasi PBM untuk melihat Nilai\nj) Masa Remedial Teaching & Testing ( wajib bagi yang nilainya D, E dan opsional bagi yang nilainya B,BC, C)\na) Registrasi pembayaran dpp\nb) Perwalian ( maksimal mengambil 24 sks jika IPK >3.0)\nc) Proses Belajar-Mengajar ( Perkuliahan Sesi 1)\nd) Ujian (UTS)\ne) Proses Belajar-Mengajar ( Perkuliahan Sesi 2)\nf) Ujian UAS\ng) Penilaian Akhir\nh) Pengisian Kuesioner Evaluasi PBM untuk melihat Nilai\ni) Masa Remedial Teaching & Testing ( wajib bagi yang nilainya D, E dan opsional bagi yang nilainya B,BC, C)\n## Untuk mahasiswa yang mengikuti MBKM, dengan syarat sudah melewati semester 4, IPK>3.0 dan raihan SKS Lulus >=70, maka alurnya adalah sebagai berikut\na) Pengajuan\n- Untuk MBKM atas biaya DIKTI, mahasiswa meminta surat pengantar dari kampus untuk mendaftar ke DIKTI. Jika sudah diterima baru mengentrykan ajuan ke SITU 2.0",
+        "- IPK dari semua matakulai non inti SKS $ \\geq 2 $\nc. Semua CPL yang telah ditetapkan oleh Prodi telah ditempuh dan mendapatkan nilai diatas ambang yang ditetapkan di setiap CPL\nRincian nilai per mata kuliah per semester akan dicantumkan dalam dokumen kelulusan yang disebut dengan TRANSKRIP AKADEMIK Berbasis Mata kuliah dan berbasis CPL\n## D. Cara Melihat Nilai\nSyarat untuk melihat Nilai di menu KHS adalah harus mengisi kuesioner terlebih dahulu",
+        "| II | 19 | 7 | IF2100202-Matematika Informatika I-3 SKS | IF2100203-Probabilitas dan Statistika-3 SKS | IF2100204-Algoritma dan Pemograman I-3 SKS | IF2100205-Pemograman Web-3 SKS | IF2100206-Pemograman Basis Data-3 SKS | IF2100207-Infrastruktur Jaringan-2 SKS |  |  |  |  |  |  | IF2100201-Pendidikan Pancasila-2 SKS |\n| I | 19 | 8 | IF2100102-Literasi Digital-2 SKS | IF2100103-Matematika Dasar-3 SKS | IF2100104-Metode Berpikir Komputasi-2 SKS | IF2100105-Internet dan Teknologi Web-3 SKS | IF2100106-Perancangan Basis Data-3 SKS | IF2100107-Infrastruktur Teknologi Informasi-2 SKS | IF2100108-Sistem Multimedia-2 SKS |  |  |  |  |  | KPT4.0-2 SKS |\n| Total | 144 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |",
+        "angkatan yang bersangkutan. Sebelum sanksi ditetapkan terlebih dahulu harus melalui proses identifikasi yang cermat, yang dilakukan oleh pihak-pihak yang terkait. Penetapan sanksi dilakukan melalui proses musyawarah antara pimpinan Program Studi, fakultas dan senat fakultas dan dinyatakan syah jika ditetapkan melalui Surat Keputusan Dekan.\n## IV.9.3. Evaluasi Kinerja akademik dan Eksekusi Akhir Masa Studi\nPedoman Tata Cara Eksekusi Akhir Masa Studi Mahasiswa Di Lingkungan Fakultas Teknik Universitas Pasundan sesuai dengan SK Dekan Nomor : 977/UnpasFT.D/SK/Q/VIII/2023.\nKinerja akademik adalah kriteria minimal raihan SKS lulus untuk sejumlah tahun akademik yang sudah dilalui berikut IPK nya. Evaluasi kinerja akademik ditujuan untuk mencegah terjadinya eksekusi akhir masa studi. Aksi hasil dari evaluasi kinerja akademik adalah pemanggilan mahasiswa bersama dengan orang tuanya serta konfirmasi komitmen untuk memperbaiki kinerja akademiknya",
+        "a. Laboratorium Gambar dan Perancangan\nb. Laboratorium Proses Manufaktur\nc. Laboratorium Fisika\nd. Laboratorium Metrologi Industri\ne. Laboratorium Pengukuran Teknik\nf. Laboratorium Uji Prestasi Mesin\ng. Laboratorium Teknik Produksi\nh. Laboratorium CAD/CAM\ni. Laboratorium Material Teknik\nj. Laboratorium Perancangan & Element Mesin (studio)\nk. Laboratorium Mekatronika\n## V.1.4. Laboratorium Teknik Informatika\nLaboratorium Teknik Informatika adalah sarana untuk melaksanakan kegiatan belajar mengajar Matakuliah Praktikum, penyelenggaraan acara-acara keinformatikaan, kegiatan study club, serta menjadi homebase Unit Bisnis Motekar dan Inkubator Bisnisnya. Pada kurikulum 2021, Laboratorium Teknik Informatika melayani 11 Mata Kuliah Praktikum dengan total 16 sks, yang mana setiap sks berarti 100 menit kegiatan belajar tatap muka/sinkron.\nDalam operasionalnya ada beberapa prosedur yang harus diketahui oleh mahasiswa yaitu:\n1. Pendaftaran Praktikum",
+        "| IV | 20 | 8 | IF2100401-Pemograman Berorientasi Objek-3 SKS | IF2100402-Interaksi Manusia dan Komputer-3 SKS | IF2100403-Teori Komputasi-2 SKS | IF2100404-Sistem Manajemen Basis Data-3 SKS | IF2100405-Analisis Sistem / System Informasi-3 SKS | IF2100406-Sistem Berorientasi Objek-2 SKS | IF2100407-Praktikum Multimedia-2 SKS | IF2100408-Praktikum Pemograman I-2 SKS |  |  |  |  |  |\n| III | 18 | 8 | IF2100302-Matematika Informatika II-3 SKS | IF2100303-Algoritma dan Pemograman II-3 SKS | IF2100304-Rekayasa Perangkat Lunak-3 SKS | IF2100305-Infrastruktur Pendukung Aplikasi-2 SKS | IF2100306-Organisasi & Proses Bisnis-2 SKS | IF2100307-Praktikum Basis Data-2 SKS | IF2100308-Praktikum Infrastruktur-1 SKS |  |  |  |  |  | IF2100301-Kewarganegaraan-2 SKS |"
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 1.0,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 0.8
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Kurikulum Teknik Informatika Unpas 2021 (versi Publik - Tanpa RPS).pdf",
+        "difficulty": "hard",
+        "reasoning_type": "multi-hop",
+        "noise_level": "high",
+        "original_id": "ragas_q8",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "multi_doc",
+        "topic": "sks",
+        "source_doc_ids": []
+      }
+    },
+    {
+      "id": "d1-09",
+      "user_input": "Kalau mau dapat predikat Cum Laude pas yudisium syarat IPK-nya berapa dan maksimal berapa tahun kuliahnya?",
+      "reference": "Untuk mendapatkan predikat Dengan Pujian (Cum Laude) pada saat yudisium, mahasiswa harus memiliki IPK antara 3.51 hingga 4.00 dan telah menyelesaikan masa studi maksimal dalam waktu 5 tahun.",
+      "response": "Untuk predikat **Dengan Pujian (Cum Laude)** saat yudisium, syaratnya adalah **IPK 3,51 ≤ IPK ≤ 4,00** dengan syarat **masa studi ≤ 5 tahun** [1].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "## IV.6. Yudisium\nYudisium adalah proses penilaian akhir dari seluruh mata kuliah yang telah diambil mahasiswa dan penetapan nilai dalam transkrip akademik, serta memutuskan nilai IPK terakhir serta grade yudisiumnya.\nMasa studi terpakai tidak lebih dari 5 tahun. Adapun kualitas yudisium lulusan program studi strata 1 (S1) dinyatakan dengan predikat sebagai berikut :\n| - | : IPK<2.75 | : IPK<2.75 |\n| --- | --- | --- |\n| Memuaskan | : 2,75≤IPK<3,00 | : 2,75≤IPK<3,00 |\n| Sangat Memuaskan | : 3,01≤IPK<3,50 | : 3,01≤IPK<3,50 |\n| Dengan Pujian (Cum Laude) | : 3,51≤IPK≤4,00 dengan syarat masa studi<=5 tahun | : 3,51≤IPK≤4,00 dengan syarat masa studi<=5 tahun |\nMahasiswa yang sudah selesai melakukan sidang dan revisi akan didaftarkan sebagai peserta yudisium oleh petugas. Setelah di daftarkan mahasiswa bisa melakukan pengajuan yudisium. Di menu tersebut mahasiswa harus melengkapi beberapa persyaratan yang diperlukan untuk dokumen kelulusan.\n<div align=\"center\">\n\nAlur mahasiswa Yudisium",
+        "b. Tanggap terhadap kemajuan ilmu dan teknologi serta dinamika perubahan sosial dan kemasyarakatan di era disrupsi revolusi industri 4.0, khususnya yang berkaitan dengan bidang keahliannya.\nc. Menguasai dasar-dasar ilmiah serta pengetahuan dan metodologinya sehingga mampu menemukan, memahami, menjelaskan dan merumuskan penyelesaian masalah yang ada di dalam kawasan keahliannya.\nd. Secara kuantitatif memenuhi kriteria IPK rata-rata >3.25; masa studi <=4.5 tahun, dan waktu tunggu mendapatkan pekerjaan pertama <= 6 bulan.\n## Strategi\n<div align=\"center\">",
+        "- Tiap mata kuliah inti harus lulus dengan Nilai Akhir $ \\geq $ C atau sesuai definisi di kurikulum\n- Skripsi harus lulus dengan Nilai akhir $ \\geq $ C\nb. IPK $ \\geq 2. 0 $ dengan ketentuan :\n- Proses perhitungan IPK ini sama dengan proses perhitungan IPs,",
+        "Buku panduan akademik ini dirancang untuk memandu Anda selama studi di Fakultas Teknik Unpas. Mohon Anda teliti dan cermati setiap aturan akademik yang tertera. Memahami aturan-aturan tersebut akan membantu Anda dalam melalui proses studi dengan lancar. Kurikulum yang ditawarkan telah disusun dengan cermat untuk memastikan Anda mendapatkan pendidikan terbaik. Oleh karena itu, gunakanlah panduan ini sebagai kompas selama di kampus.\nKami berharap Anda dapat menyelesaikan studi kurang dari 5 tahun dengan IPK diatas 3.25. Tidak hanya itu, kami juga berharap Anda kelak menjadi lulusan yang mampu berkontribusi bagi masyarakat, bangsa, dan dunia. Saya yakin, dengan semangat dan percaya diri, Anda dapat mencapai apa pun yang Anda impikan. Mari kita bersama-sama memastikan bahwa Anda mendapatkan pengalaman belajar yang berharga di sini.\nPergi piknik ke kota Blitar, jangan lupa membawa tikar. Jikalau hendak jadi orang pintar, Jangan berhenti untuk belajar.",
+        "Mahasiswa yang terkena evaluasi oleh Program Studi meliputi tahap sebagai berikut:\na. Tahap I Mahasiswa pada Akhir Tahun Akademik II :\n$$\n\\mathrm {I P K} < = 2, 0; \\mathrm {S K S} < = 4 0\n$$\nb. Tahap II Mahasiswa pada Akhir Tahun IV IPK <= 2,0; SKS <= 90\nc. Tahap III Mahasiswa pada Akhir Tahun VI IPK <= 2,0; SKS <= 130\nd. Reguler setiap awal tahun akademik jika tiga semester berturut-turut tidak aktif\nEksekusi akhir masa studi adalah penetapan status akademik seorang mahasiswa dinyatakan mengundurkan diri/ keluar melalui SK Rektor. Eksekusi akhir masa studi dilakukan terhadap\n1. Mahasiswa yang tidak aktif selama 4 semester berturut-tutur , penetapan dilakukan pada saat awal semester ke 5 ybs tidak aktif\n2. Mahasiswa yang sampai pada akhir semester 14 belum dinyatakan lulus (30 September)\n3. Mahasiswa yang dengan capaian SKS lulus dan sisa jatah waktu studinya yang masih tersisa tidak memungkinkan untuk bisa lulus pendidikan sarjana, yakni\na. Akhir Tahun ke V, sks lulus <=48",
+        "- IPK dari semua matakulai non inti SKS $ \\geq 2 $\nc. Semua CPL yang telah ditetapkan oleh Prodi telah ditempuh dan mendapatkan nilai diatas ambang yang ditetapkan di setiap CPL\nRincian nilai per mata kuliah per semester akan dicantumkan dalam dokumen kelulusan yang disebut dengan TRANSKRIP AKADEMIK Berbasis Mata kuliah dan berbasis CPL\n## D. Cara Melihat Nilai\nSyarat untuk melihat Nilai di menu KHS adalah harus mengisi kuesioner terlebih dahulu",
+        "10. Menghormati semua pihak demi terbinanya suasana hidup kekeluargaan.\n11. Memelihara dan meningkatkan mutu lingkungan hidup kampus Universitas Pasundan Bandung.\n12. Mentaati semua peraturan yang berlaku di Universitas Pasundan Bandung.\n## Bagian Ketiga\n## Syarat dan Ketentuan Pengurus Lembaga Kemahasiswaan Pasal 7\nSemua Pengurus Lembaga Kemahasiswaan di lingkungan Universitas Pasundan harus memenuhi syarat-syarat umum sebagai berikut:\n1. Bertaqwa kepada Tuhan Yang Maha Esa.\n2. Jujur, terpecaya,cakap,dan mampu memimpin.\n3. Terdaftar aktif sebagai mahasiswa Unpas dalam tahun yang sedang berjalan.\n4. Tidak sedang dikenai sanksi akademik dan atau sanksi kemahasiswaan.\n5. Memiliki prestasi dibidang akademik atau non akademik (IPK 2.75)\n6. Pada saat pengusulan berlangsung, calon sekurang-kurangnya berada pada semester III (tiga) sampai maksimal berada pada semester VI (enam).\n7. Syarat-syarat lain akan ditetapkan melalui Surat Keputusan Dekan di tingkat Fakultas.\n## BAB IV",
+        "g) Ujian UAS\nh) Penilaian Akhir\ni) Pengisian Kuesioner Evaluasi PBM untuk melihat Nilai\nj) Masa Remedial Teaching & Testing ( wajib bagi yang nilainya D, E dan opsional bagi yang nilainya B,BC, C)\na) Registrasi pembayaran dpp\nb) Perwalian ( maksimal mengambil 24 sks jika IPK >3.0)\nc) Proses Belajar-Mengajar ( Perkuliahan Sesi 1)\nd) Ujian (UTS)\ne) Proses Belajar-Mengajar ( Perkuliahan Sesi 2)\nf) Ujian UAS\ng) Penilaian Akhir\nh) Pengisian Kuesioner Evaluasi PBM untuk melihat Nilai\ni) Masa Remedial Teaching & Testing ( wajib bagi yang nilainya D, E dan opsional bagi yang nilainya B,BC, C)\n## Untuk mahasiswa yang mengikuti MBKM, dengan syarat sudah melewati semester 4, IPK>3.0 dan raihan SKS Lulus >=70, maka alurnya adalah sebagai berikut\na) Pengajuan\n- Untuk MBKM atas biaya DIKTI, mahasiswa meminta surat pengantar dari kampus untuk mendaftar ke DIKTI. Jika sudah diterima baru mengentrykan ajuan ke SITU 2.0",
+        "| GRADE | BOBOT ANGKA | PEMETAAN ke NILAI 0-100 | PERINGKAT | DESKRIPSI |\n| --- | --- | --- | --- | --- |\n| A | 4 | 80-100 | Istimewa | Menuntaskan CPL/CPMK dengan istimewa |\n| AB | 3,5 | 70-79,9 | Sangat Baik | Menuntaskan CPL/CPMK dengan sangat baik |\n| B | 3 | 60-69,9 | Baik | Menuntaskan CPL/CPMK dengan baik |\n| BC | 2,5 | 50-59,9 | Cukup Baik | Menuntaskan CPL/CPMK dengan predikat cukup baik |\n| C | 2 | 40-49,9 | Cukup | Menuntaskan CPL/CPMK dengan predikat cukup |\n| D | 1 | 30-39,9 | Kurang | Menuntaskan CPL/CPMK dengan predikat Kurang |\n| E | 0 | 0-29,9 | Gagal | Gagal Menuntaskan CPL/CPMK |\n## B. Evaluasi Keberhasilan Studi Setiap Semester\nEvaluasi dilakukan pada akhir tiap semester. Keberhasilan studi tiap semester diukur dengan indeks prestasi (IP). Proses perhitungan indeks prestasi untuk setiap semester sebagai berikut :\na. Mengetahui SKS x bobot untuk tiap mata kuliah yang ditempuh.",
+        "a. Mengetahui SKS x bobot untuk tiap mata kuliah yang ditempuh.\nb. Menjumlahkan hasil perhitungan SKS x bobot untuk semua mata kuliah yang ditempuh pada semester yang bersangkutan atau (SKS x NA).\nc. Cara perhitungan IP :\nSetelah seluruh nilai matakuliah yang diambil pada semester tertentu keluar, maka IP (indeks prestasi) pada semester tersebut dapat dihitung menggunakan rumus :\n$$\n\\sum \\mathrm {B o b o t K u a l i t a s}\n$$\nIPs = ---------------------------------------------------------------------------\n$ \\sum $ SKS Matakuliah yang telah diumumkan\ndimana :\nBobot kualitas = (SKS per mata kuliah x Bobot)\n## C. Evaluasi Keberhasilan Studi Pada Akhir Program\nSeorang mahasiswa dapat dinyatakan berhasil menyelesaikan program studi S1, bila memenuhi :\na. Lulus seluruh matakuliah yang dibebankan, dengan ketentuan :\n- Tiap mata kuliah inti harus lulus dengan Nilai Akhir $ \\geq $ C atau sesuai definisi di kurikulum\n- Skripsi harus lulus dengan Nilai akhir $ \\geq $ C"
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 1.0,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 1.0
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Wadek1-Buku Panduan Akademik FT Unpas 2023-2024 Publish.pdf",
+        "difficulty": "easy",
+        "reasoning_type": "single-hop",
+        "noise_level": "low",
+        "original_id": "ragas_q9",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "simple",
+        "topic": "tugas_akhir",
+        "source_doc_ids": []
+      }
+    },
+    {
+      "id": "d1-10",
+      "user_input": "Min, buat dapat beasiswa KIP Kuliah, penghasilan kotor ortu maksimal berapa ya?",
+      "reference": "Syarat keterbatasan ekonomi untuk pendaftaran KIP Kuliah dibuktikan dengan pendapatan kotor gabungan orang tua/wali maksimal sebesar Rp 4.000.000,00 per bulan, atau pendapatan kotor gabungan tersebut dibagi jumlah anggota keluarga dengan hasil maksimal Rp 750.000,00 per bulan.",
+      "response": "Berdasarkan dokumen, untuk mendapatkan KIP Kuliah, pendapatan kotor gabungan orang tua/wali maksimal adalah **Rp 4.000.000,00 (empat juta rupiah)** per bulan, **atau** pendapatan kotor gabungan orang tua/wali dibagi jumlah anggota keluarga maksimal **Rp 750.000,00 (tujuh ratus lima puluh ribu rupiah)** [1].",
+      "retrieved_context_count": 10,
+      "retrieved_contexts": [
+        "4. Dalam hal mahasiswa belum memiliki KIP atau orang tua/wali belum memiliki KKS, maka dapat tetap mendaftar untuk mendapatkan KIP Kuliah asalkan memenuhi persyaratan tidak mampu secara ekonomi sesuai dengan ketentuan, yang dibuktikan dengan pendapatan kotor gabungan orang tua/wali sebesar Rp 4.000.000,00 (empat juta rupiah) atau pendapatan kotor gabungan orang tua/wali dibagi jumlah anggota keluarga maksimal Rp750.000,00 (tujuh ratus lima puluh ribu rupiah).\n5. Keputusan akhir penerima akan diambil oleh perguruan tinggi masing-masing berdasarkan hasil seleksi.",
+        "h Biro Kemahahasiswaan memberikan surat pemberitahuan Kepada Wakil Dekan III Untuk pengambilan dana Beasiswa.\n## 8. Prosedur Pengajuan Beasiswa KIP Kuliah\n## A. Persyaratan Penerima KIP Kuliah\n1. Penerima KIP Kuliah adalah siswa SMA atau sederajat yang akan lulus pada tahun berjalan atau lulus 2 (dua) tahun sebelumnya;\n2. Memiliki potensi akademik baik tetapi memiliki keterbatasan ekonomi yang didukung bukti dokumen yang sah;\n3. Keterbatasan ekonomi dibuktikan dengan kepemilikan program bantuan pendidikan nasional dalam bentuk Kartu Indonesia Pintar (KIP) atau berasal dari keluarga peserta Program Keluarga Harapan (PKH), keluarga pemegang Kartu Keluarga Sejahtera (KKS) serta mahasiswa dari panti sosial/panti asuhan.",
+        "UNIVERSITAS PASUNDAN",
+        "| 4.32123.143.23 | 6.54432 | 5.37.6 |  |\n| 2.17123.321.71 | 4.5654 | 5.53.2 |  |\n| 1.45567.555.55 | 4.5654 | 5.53.2 |  |\n| 1.45545.565.47 | 4.32234 | 3.56.5 |  |\n| men ca pai ilmu dan ci-ta ci-ta kaulah al-ma materku me wu-jud-kan sgala ci-ta ci-ta kaulah al-ma materku ter-cin-ta U |  |  |  |\n| 54713.21 | 1.561 | 1.0 |  |\n| 32711.75 | 5.522 | 3.0 |  |\n| 16565.43 | 3.126 | 1.0 |  |\n| 5555.51 | 1.566 | 1.0 |  |\n| univer sitas Pa-sun-dan | dan Kau-mu-li | -a |  |\n| univer sitas Pa-sun-dan | dan Kau-mu-li | -a |  |",
+        "dimanfaatkan demi kemajuan dan peningkatan kinerja Program Studi Teknik Informatika, Universitas Pasundan.\nBandung, Agustus 2021 Tim Penyusun\n\n## IDENTITAS PROGRAM STUDI\n| 1 | Nama Perguruan Tinggi(PT) | Universitas Pasundan □PTN□PTS |\n| --- | --- | --- |\n| 2 | Fakultas | Fakultas Teknik |\n| 3 | Jurusan/Departemen | Teknik Informatika |\n| 4 | Program Studi | Teknik Informatika |\n| 5 | Status Akreditasi | B |\n| 6 | Jumlah Mahasiswa |  |\n| 7 | Jumlah Dosen |  |\n| 8 | Alamat Prodi | Jalan Dr. Setiabudhi No.193 Bandung |\n| 9 | Telpon |  |\n| 10 | Web PRODI/PT | www.if.unpas.ac.id |",
+        "UNIVERSITAS PASUNDA\nProf. Dr. Ir. Yusman Taufik, MP.\n\nTeknik Industri □ 022 - 2019335\n\nTeknologi Pangan □ 022 - 2019339\n\nTeknik Mesin □ 022 - 2019352\n\nTeknik Informatika □ 022 - 2019371\n\nTeknik Lingkungan □ 022 - 2009574\n\nun Wilayah dan Kota □ 022 - 2006466\nSURAT KEPUTUSAN\n\nDEKAN FAKULTAS TEKNIK UNIVERSITAS PASUNDAN BANDUNG",
+        "BUKU PANDUAN\n\nAKADEMIK\n\nFAKULTAS TEKNIK\n\nTahun Akademik 2023/2024\nfakultasteknikunpas | www.teknik.unpas.ac.id\n\n<div align=\"center\">\n\n# Kata Pengantar",
+        "5. Jika proses validasi berhasil, Sistem KIP Kuliah selanjutnya akan mengirimkan Nomor Pendaftaran dan Kode Akses ke alamat email yang didaftarkan.\n6. Siswa menyelesaikan proses pendaftaran KIP Kuliah dan memilih proses seleksi yang akan diikuti (SNMPTN/SBMPTN/SNMPN/SBMPN/Mandiri);\n7. Siswa menyelesaikan proses pendaftaran di portal atau sistem informasi seleksi nasional masuk perguruan tinggi sesuai jalur yang dipilih.\n8. Bagi calon penerima KIP Kuliah yang telah dinyatakan diterima di Perguruan Tinggi, dapat dilakukan verifikasi lebih lanjut oleh Perguruan Tinggi sebelum diusulkan sebagai calon mahasiswa penerima KIP Kuliah.",
+        "- Tiap mata kuliah inti harus lulus dengan Nilai Akhir $ \\geq $ C atau sesuai definisi di kurikulum\n- Skripsi harus lulus dengan Nilai akhir $ \\geq $ C\nb. IPK $ \\geq 2. 0 $ dengan ketentuan :\n- Proses perhitungan IPK ini sama dengan proses perhitungan IPs,",
+        "## DOKUMEN KURIKULUM\nTEKNIK INFORMATIKA\nUniversitas Pasundan\n\nTIM PENYUSUN\n\nDOKUMEN\n<div align=\"center\">\n\n# Penyusunan Kurikulum Pendidikan Tinggi Program Studi Teknik Informatika\n\n</div>\nBandung, Agustus 2021\nNama Ketua Tim : Dr. Ayi Purbasari S.T., M.T.,\nNIDN :0424057201\nProgram Studi : Teknik Informatika\nFakultas : Fakultas Teknik\nUniversitas : Universitas Pasundan\n\n## DAFTAR ISI\n1 LANDASAN KURIKULUM ...1\n\n1.1 LANDASAN FILOSOFI ...1\n\n1.2 LANDASAN SOSILOGIS ...1\n\n1.3 LANDASAN HISTORIS ...2\n\n1.4 LANDASAN HUKUM ...3\n\n2 VISI, MISI, TUJUAN, DAN STRATEGI PROGRAM STUDI ...4\n\n2.1 VISI ...4\n\n2.2 MISI ...4\n\n2.3 TUJUAN ...4\n\n2.4 STRATEGI ...5\n\n2.4.1 Bidang Organisasi dan Manajemen ...5\n\n2.4.2 Bidang Pengembangan Pendidikan dan Kemanusian ...5\n\n2.4.3 Program Pengembangan Penelitian ...7\n\n2.4.4 Bidang Pengembangan Pengabdian kepada Masyarakat ...8\n\n2.4.5 Bidang Pengembangan Kerjasama Institusional ...8\n\n2.4.6 Bidang Peningkatan Mutu Penyelenggaraan ...8\n\n2.5 UNIVERSITAS VALUE ...9"
+      ],
+      "retrieved_chunks": [],
+      "scores": {
+        "faithfulness": 0.5,
+        "context_recall": 1.0,
+        "factual_correctness(mode=f1)": 1.0
+      },
+      "failures": {},
+      "metadata": {
+        "source_file": "Buku Pedoman Kemahasiswaan.pdf",
+        "difficulty": "medium",
+        "reasoning_type": "single-hop",
+        "noise_level": "medium",
+        "original_id": "ragas_q10",
+        "original_dataset": "ragas_dataset_11051234.jsonl",
+        "answerable": true,
+        "dataset_version": "public_beta_v1",
+        "question_type": "simple",
+        "topic": "beasiswa",
+        "source_doc_ids": []
+      }
+    }
+  ],
+  "artifacts": {
+    "json": ".tmp_probe\\reports\\ten_v4_coverage.json",
+    "csv": ".tmp_probe\\reports\\ten_v4_coverage.csv",
+    "markdown": ".tmp_probe\\reports\\ten_v4_coverage.md"
+  }
+}

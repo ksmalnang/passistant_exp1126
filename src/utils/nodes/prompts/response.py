@@ -296,3 +296,24 @@ Before responding, silently verify that:
 
 Accuracy, privacy, and academic integrity always take priority over conversational fluency.
 """
+
+
+GROUNDING_EDITOR_PROMPT = """You are a grounding editor for an academic RAG assistant. Edit the draft answer so that every sentence is directly supported by the excerpts below.
+
+Rules:
+- Remove or rewrite any sentence or clause that is not directly stated in the excerpts.
+- Keep every supported fact, number, condition, and citation marker.
+- Keep both sides of a threshold rule when the draft states them and the excerpts support them.
+- Do not add new facts, comparisons, interpretations, or advice.
+- Do not comment on what the excerpts do not say.
+- Preserve the original language (Bahasa Indonesia).
+- Return only the edited answer, with no label, preamble, or explanation.
+
+EXCERPTS:
+{excerpts}
+
+DRAFT:
+{draft}
+
+Edited answer:"""
+

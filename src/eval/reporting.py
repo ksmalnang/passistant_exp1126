@@ -37,6 +37,11 @@ def build_report(
                 "sample_count": len(results),
             },
             "retrieval": {"strategy": context.strategy, "top_k": context.top_k},
+            "index": {
+                "collection": context.collection,
+                "points": context.index_points,
+                "manifest": context.index_manifest,
+            },
             "models": {
                 "judge": context.judge_model,
                 "embedding": context.embedding_model,
@@ -211,6 +216,8 @@ def _sample_record(result: SampleResult) -> dict[str, Any]:
         "reference": result.sample.reference,
         "response": result.response,
         "retrieved_context_count": len(result.retrieved_contexts),
+        "retrieved_contexts": result.retrieved_contexts,
+        "retrieved_chunks": result.retrieved_chunks,
         "scores": result.scores,
         "failures": result.failures,
         "metadata": result.sample.metadata,

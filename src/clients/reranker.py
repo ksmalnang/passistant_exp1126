@@ -1,6 +1,8 @@
 """Cross-encoder reranker client."""
 
 import logging
+import threading
+import time
 from typing import Any
 
 import httpx
@@ -23,6 +25,9 @@ class RemoteReranker:
         timeout_seconds: float = 60.0,
         fallback: Any | None = None,
         provider_name: str = "remote",
+        max_retries: int = 3,
+        retry_backoff_seconds: float = 1.0,
+        min_interval_seconds: float = 0.0,
     ):
         self.endpoint = self._build_endpoint(base_url)
         self.base_url = base_url
@@ -31,6 +36,11 @@ class RemoteReranker:
         self.timeout_seconds = timeout_seconds
         self.fallback = fallback
         self.provider_name = provider_name
+        self.max_retries = max_retries
+        self.retry_backoff_seconds = retry_backoff_seconds
+        self.min_interval_seconds = min_interval_seconds
+        self._request_lock = threading.Lock()
+        self._last_request_at = 0.0
 
     def rerank(self, *, query: str, documents: list[str]) -> list[float]:
         """Return reranker scores aligned to the input document order."""
@@ -77,19 +87,33 @@ class RemoteReranker:
         if self.provider_name == "openrouter":
             headers["X-Title"] = "PASsistant"
 
-        response = httpx.post(
-            self.endpoint,
-            headers=headers,
-            json={
-                "model": self.model,
-                "query": query,
-                "documents": documents,
-                "top_n": len(documents),
-            },
-            timeout=self.timeout_seconds,
-        )
-        response.raise_for_status()
-        return self._parse_scores(response.json(), len(documents))
+        # One request at a time: parallel query variants otherwise trip the
+        # provider's rerank rate limit and silently switch rerankers mid-run.
+        with self._request_lock:
+            wait = self._last_request_at + self.min_interval_seconds - time.perf_counter()
+            if wait > 0:
+                time.sleep(wait)
+            for attempt in range(self.max_retries):
+                response = httpx.post(
+                    self.endpoint,
+                    headers=headers,
+                    json={
+                        "model": self.model,
+                        "query": query,
+                        "documents": documents,
+                        "top_n": len(documents),
+                    },
+                    timeout=self.timeout_seconds,
+                )
+                if response.status_code == 429 and attempt < self.max_retries - 1:
+                    time.sleep(self.retry_backoff_seconds * 2**attempt)
+                    self._last_request_at = time.perf_counter()
+                    continue
+                response.raise_for_status()
+                self._last_request_at = time.perf_counter()
+                return self._parse_scores(response.json(), len(documents))
+
+        raise AssertionError("unreachable: the retry loop returns or raises")
 
     def _call_fallback(self, *, query: str, documents: list[str]) -> list[float]:
         """Invoke fallback reranker (remote or local)."""
@@ -245,6 +269,8 @@ def get_reranker() -> Any:
                 model=model,
                 provider_name="openrouter",
                 fallback=fallback_reranker,
+                min_interval_seconds=3.0,
+                max_retries=4,
             )
             return _reranker
         elif fallback_reranker is not None:
@@ -275,6 +301,8 @@ def get_reranker() -> Any:
             model=model,
             provider_name=provider,
             fallback=fallback_reranker,
+            min_interval_seconds=3.0,
+            max_retries=4,
         )
         return _reranker
 

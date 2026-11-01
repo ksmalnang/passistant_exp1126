@@ -262,6 +262,24 @@ writes a report `.json`, a per-sample `.csv`, and a Markdown summary into `src/e
 
 See [docs/evaluation.md](docs/evaluation.md) for the full evaluation guide.
 
+### GraphRAG (Qdrant + Neo4j)
+
+An optional graph-augmented retrieval path links Qdrant chunks to Neo4j by the exact
+`chunk_id`. Build the graph from the same PDFs, then enable expansion:
+
+```bash
+uv run python scripts/build_kb_graph.py --collection passistant_eval_v1 \
+  --reset --llm-extract --max-llm-chunks 150
+
+GRAPH_RAG_ENABLED=true GRAPH_RAG_ROUTING=multi_hop \
+  uv run ragas-eval evaluate --dataset testset.jsonl --mode live
+```
+
+The existing Qdrant path remains the fallback when Neo4j is unavailable. See
+[docs/graphrag.md](docs/graphrag.md) for the ontology, consistency checks, traversal limits,
+and evaluation candidates.
+
+
 ---
 
 ## Environment Variables
@@ -392,3 +410,4 @@ src/
 ## License
 
 MIT
+

@@ -259,7 +259,12 @@ class SearchOperations:
         return results
 
     def _score_reranker_documents(self, query: str, documents: list[str]) -> list[float]:
-        """Score documents with the configured reranker model."""
+        """Score documents with the configured reranker model, reusing cached scores."""
+        cache_key = self._build_rerank_cache_key(query, documents)
+        cached = self.cache.get_json(cache_key)
+        if isinstance(cached, list) and len(cached) == len(documents):
+            return [float(score) for score in cached]
+
         scores = [
             float(score)
             for score in self._get_reranker().rerank(
@@ -272,11 +277,20 @@ class SearchOperations:
                 "Reranker returned an unexpected number of scores: "
                 f"expected={len(documents)}, received={len(scores)}"
             )
+        self.cache.set_json(cache_key, scores, ttl_seconds=7 * 24 * 3600)
         return scores
 
     def _build_reranker_document(self, result: dict[str, Any]) -> str:
         """Build the text payload passed to the cross-encoder reranker."""
         return result.get("text", "")
+
+    def _build_rerank_cache_key(self, query: str, documents: list[str]) -> str:
+        """Key rerank scores by model, query, and exact candidate texts."""
+        digest = hashlib.sha256()
+        digest.update(f"{self.reranker_model}|{self.reranker_base_url}|{query}".encode())
+        for document in documents:
+            digest.update(hashlib.sha256(document.encode()).digest())
+        return f"rerank:{digest.hexdigest()}"
 
     def _build_search_cache_key(
         self,
@@ -288,7 +302,7 @@ class SearchOperations:
         """Build a stable Redis key for retrieval results."""
         digest = hashlib.sha256(
             (
-                f"{query}|{document_type.value if document_type else 'all'}|"
+                f"{self.collection_name}|{query}|{document_type.value if document_type else 'all'}|"
                 f"{top_k}|{score_threshold}|{self.retrieval_strategy}|"
                 f"{self._SEARCH_RESULT_SCHEMA_VERSION}|"
                 f"{self.reranker_model or 'none'}|{self.reranker_base_url or 'local'}|"

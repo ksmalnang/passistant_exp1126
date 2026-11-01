@@ -180,3 +180,33 @@ def test_unit_get_reranker_uses_jina_directly_when_no_openrouter_key(
     assert isinstance(reranker, RemoteReranker)
     assert reranker.provider_name == "jina"
     assert reranker.model == "jina-reranker-v3"
+
+
+def test_unit_reranker_retries_429_before_falling_back(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A rate-limited primary request is retried instead of switching rerankers."""
+    calls = 0
+
+    def fake_post(url: str, **kwargs: Any) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        request = httpx.Request("POST", url)
+        if calls == 1:
+            return httpx.Response(429, text="Too Many Requests", request=request)
+        return httpx.Response(
+            200,
+            json={"results": [{"index": 0, "relevance_score": 0.7}]},
+            request=request,
+        )
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    reranker = RemoteReranker(
+        base_url="https://openrouter.ai/api/v1",
+        api_key="sk-or-test",
+        model="voyageai/rerank-3-lite",
+        provider_name="openrouter",
+        retry_backoff_seconds=0.0,
+    )
+
+    assert reranker.rerank(query="test", documents=["Doc A"]) == [0.7]
+    assert calls == 2
+

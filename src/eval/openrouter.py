@@ -329,7 +329,9 @@ def _reasoning_controls(settings: Any) -> dict[str, Any] | None:
     if enabled is None:
         enabled = settings.LLM_REASONING_ENABLED
     if not enabled:
-        return None
+        # Omitting the field lets the provider decide, and some models then spend
+        # thousands of tokens reasoning before emitting the JSON verdicts.
+        return {"enabled": False}
 
     exclude = settings.RAGAS_LLM_REASONING_EXCLUDE
     if exclude is None:

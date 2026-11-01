@@ -191,6 +191,21 @@ class Settings(BaseSettings):
         le=3,
         description="Maximum query variants searched per retrieval turn",
     )
+    GROUNDING_EDITOR_ENABLED: bool = Field(
+        default=False,
+        description=(
+            "Run a second pass that removes answer claims not directly supported by the "
+            "retrieved excerpts before returning the response"
+        ),
+    )
+    RESPONSE_PROMPT_FILE: Optional[Path] = Field(
+        default=None,
+        description="Optional system prompt file for response generation experiments",
+    )
+    GROUNDING_EDITOR_PROMPT_FILE: Optional[Path] = Field(
+        default=None,
+        description="Optional grounding editor prompt file",
+    )
     RERANKER_PROVIDER: Literal["openrouter", "jina", "custom", "local"] = Field(
         default="openrouter",
         description="Primary reranker provider: openrouter, jina, custom, or local",
@@ -250,6 +265,42 @@ class Settings(BaseSettings):
     CHUNK_SEPARATORS: list[str] = Field(
         default_factory=lambda: ["\n\n", "\n", ". ", " ", ""],
         description="Ordered separators for RecursiveCharacterTextSplitter",
+    )
+
+    # --- GraphRAG (Neo4j) Configuration ---
+    NEO4J_URI: str = Field(default="bolt://localhost:7687")
+    NEO4J_USER: str = Field(default="neo4j")
+    NEO4J_PASSWORD: Optional[str] = Field(default=None)
+    NEO4J_DATABASE: str = Field(default="neo4j")
+    GRAPH_RAG_ENABLED: bool = Field(
+        default=False,
+        description="Enable Qdrant-seeded Neo4j graph expansion during retrieval",
+    )
+    GRAPH_RAG_ROUTING: Literal["always", "multi_hop"] = Field(
+        default="always",
+        description="Run graph expansion for every query or only relationship-heavy queries",
+    )
+    GRAPH_RAG_MAX_HOPS: int = Field(default=1, ge=1, le=2)
+    GRAPH_RAG_MAX_ENTITIES: int = Field(default=25, ge=1)
+    GRAPH_RAG_MAX_EXTRA_CHUNKS: int = Field(default=4, ge=0)
+    GRAPH_RAG_MAX_ENTITY_FREQUENCY: int = Field(
+        default=40,
+        description="Skip entities mentioned by more chunks than this during expansion",
+    )
+    GRAPH_RAG_TIMEOUT_SECONDS: float = Field(default=3.0, gt=0)
+    GRAPH_RAG_ALLOWED_RELATIONSHIPS: list[str] = Field(
+        default_factory=lambda: [
+            "OFFERED_IN",
+            "PART_OF",
+            "REQUIRES",
+            "HAS_DEADLINE",
+            "APPLIES_TO",
+            "EVALUATED_BY",
+            "PREREQUISITE_OF",
+            "REQUIRED_FOR",
+            "CONDITION_OF",
+            "GOVERNS",
+        ],
     )
 
     # --- Redis Cache ---

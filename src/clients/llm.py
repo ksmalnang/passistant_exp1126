@@ -27,7 +27,9 @@ REWRITE_EXTRA_BODY = {"reasoning": {"enabled": False}}
 def _build_reasoning_extra_body(settings: Any) -> dict[str, Any] | None:
     """Build provider reasoning controls for OpenAI-compatible requests."""
     if not settings.LLM_REASONING_ENABLED:
-        return None
+        # Omitting the field lets the provider decide; several models then reason
+        # by default, which adds latency and can exceed the request timeout.
+        return {"reasoning": {"enabled": False}}
 
     reasoning = {"exclude": settings.LLM_REASONING_EXCLUDE}
     if settings.LLM_REASONING_MAX_TOKENS is not None:
@@ -82,6 +84,7 @@ def _build_chat_model(
         # URL; with a custom base URL a streaming call reports no token usage.
         stream_usage=streaming,
         extra_body=extra_body,
+        timeout=120.0,
         **kwargs,
     )
 

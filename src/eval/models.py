@@ -32,6 +32,7 @@ class SampleResult:
     sample: DatasetSample
     response: str
     retrieved_contexts: list[str]
+    retrieved_chunks: list[dict[str, Any]] = field(default_factory=list)
     scores: dict[str, float] = field(default_factory=dict)
     failures: dict[str, str] = field(default_factory=dict)
 
@@ -71,3 +72,6 @@ class RunContext:
     pipeline_model: str
     started_at: datetime
     duration_seconds: float
+    collection: str = ""
+    index_points: int | None = None
+    index_manifest: str | None = None

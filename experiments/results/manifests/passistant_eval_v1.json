@@ -1,0 +1,69 @@
+{
+  "collection": "passistant_eval_v1",
+  "created_at": "2026-10-27T12:04:24.983157+00:00",
+  "chunks": 920,
+  "llm_extraction": {
+    "enabled": true,
+    "selected_chunks": 150,
+    "max_chunks": 150,
+    "cache_dir": "data\\processed\\graph_extraction\\passistant_eval_v1",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "cached": 150,
+      "llm_chunks": 150
+    }
+  },
+  "course_titles": 106,
+  "stats": {
+    "chunks": 920,
+    "entities": 678,
+    "relationships": 3826,
+    "entity_types": {
+      "Requirement": 188,
+      "Course": 172,
+      "Organization": 121,
+      "Role": 54,
+      "Regulation": 43,
+      "Program": 32,
+      "Evaluation": 22,
+      "Semester": 19,
+      "Deadline": 16,
+      "ElectiveGroup": 8,
+      "Scholarship": 3
+    }
+  },
+  "entity_mentions": {
+    "Organization": 181,
+    "Program": 301,
+    "Requirement": 189,
+    "Course": 542,
+    "Semester": 321,
+    "Role": 75,
+    "Scholarship": 5,
+    "Regulation": 43,
+    "ElectiveGroup": 47,
+    "Evaluation": 22,
+    "Deadline": 16
+  },
+  "relationship_assertions": {
+    "APPLIES_TO": 34,
+    "REQUIRES": 104,
+    "OFFERED_IN": 458,
+    "PART_OF": 483,
+    "CONDITION_OF": 33,
+    "GOVERNS": 28,
+    "HAS_DEADLINE": 11,
+    "EVALUATED_BY": 8,
+    "REQUIRED_FOR": 4,
+    "PREREQUISITE_OF": 1
+  },
+  "consistency": {
+    "qdrant_chunks": 920,
+    "graph_chunks": 920,
+    "missing_in_graph": [],
+    "orphaned_in_graph": [],
+    "mentions_without_provenance": 0
+  },
+  "elapsed_seconds": 19.2
+}

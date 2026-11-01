@@ -8,6 +8,7 @@ from langchain_core.messages import HumanMessage
 
 from src.clients.llm import get_rewrite_llm
 from src.config import get_settings
+from src.graph.expand import GraphExpander, build_graph_expander
 from src.services.contracts import DocumentRetriever
 from src.services.followup import JevFollowUpClassifier
 from src.utils.messages import conversation_transcript
@@ -116,6 +117,7 @@ class RetrievalNode:
         retriever: DocumentRetriever | None = None,
         llm_provider=get_rewrite_llm,
         follow_up_classifier: JevFollowUpClassifier | None = None,
+        graph_expander: GraphExpander | None = None,
     ):
         self.vector_tools = retriever or VectorStoreTools()
         self._llm_provider = llm_provider
@@ -124,6 +126,7 @@ class RetrievalNode:
         settings = get_settings()
         self.top_k = settings.RETRIEVAL_TOP_K
         self.max_query_variants = settings.RETRIEVAL_MAX_QUERY_VARIANTS
+        self.graph_expander = graph_expander or build_graph_expander(settings)
 
     async def run(self, state: AgentState) -> dict:
         """
@@ -176,6 +179,11 @@ class RetrievalNode:
                 if follow_up
                 else (queries[1] if len(queries) > 1 else queries[0])
             )
+            graph_trace: dict[str, Any] = {}
+            if self.graph_expander is not None:
+                merged_results, graph_trace = self.graph_expander.expand(
+                    canonical_query, merged_results, self.top_k
+                )
             confidence, warning = self._score_retrieval_confidence(
                 query=canonical_query,
                 results=merged_results,
@@ -199,10 +207,12 @@ class RetrievalNode:
                     "scope": scope,
                     "results": len(merged_results),
                     "confidence": confidence,
+                    "graph_trace": graph_trace,
                 },
             )
             return {
                 "retrieved_chunks": merged_results[: self.top_k],
+                "graph_trace": graph_trace,
                 "resolved_query": canonical_query,
                 "retrieval_scope": scope,
                 "requires_retrieval": False,

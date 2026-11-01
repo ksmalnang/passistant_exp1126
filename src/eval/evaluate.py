@@ -7,6 +7,7 @@ import math
 import time
 import warnings
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from src.eval.dataset import load_dataset
@@ -45,13 +46,19 @@ async def run_evaluation(config: EvaluationConfig) -> dict[str, Any]:
     started = time.perf_counter()
 
     samples = load_dataset(config.dataset_path)
-    usage = Usage()
-    client = OpenRouterClient(config.openrouter or default_openrouter_settings(), usage)
-    results = await _collect_results(samples, config, usage)
 
     from src.config import get_settings
 
     settings = get_settings()
+    if config.mode == "live":
+        collection, points, manifest = _index_info(settings, require_nonempty=True)
+    else:
+        collection, points, manifest = "", None, None
+
+    usage = Usage()
+    client = OpenRouterClient(config.openrouter or default_openrouter_settings(), usage)
+    results = await _collect_results(samples, config, usage)
+
     judge_model = settings.RAGAS_LLM_MODEL or settings.LLM_MODEL
     embedding_model = settings.RAGAS_EMBEDDING_MODEL or settings.EMBEDDING_MODEL
     await _score(results, client, judge_model, embedding_model)
@@ -64,6 +71,9 @@ async def run_evaluation(config: EvaluationConfig) -> dict[str, Any]:
         pipeline_model=settings.LLM_MODEL,
         started_at=started_at,
         duration_seconds=time.perf_counter() - started,
+        collection=collection,
+        index_points=points,
+        index_manifest=manifest,
     )
     report = build_report(config, results, usage.as_dict(), context)
     write_report(report, config)
@@ -98,7 +108,7 @@ def build_metrics() -> list[Any]:
     return [
         Faithfulness(max_retries=3),
         ContextRecall(),
-        FactualCorrectness(),
+        FactualCorrectness(mode="f1"),
     ]
 
 
@@ -202,6 +212,22 @@ def _as_score(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return None if math.isnan(numeric) else numeric
+
+
+def _index_info(settings: Any, *, require_nonempty: bool) -> tuple[str, int | None, str | None]:
+    """Return the collection used for this run, its point count, and its manifest."""
+    from src.clients.qdrant import get_qdrant_client
+
+    collection = settings.QDRANT_COLLECTION_NAME
+    client = get_qdrant_client()
+    if not client.collection_exists(collection):
+        raise RuntimeError(f"Qdrant collection {collection!r} does not exist; build the index first")
+    points = client.get_collection(collection).points_count or 0
+    if require_nonempty and points == 0:
+        raise RuntimeError(f"Qdrant collection {collection!r} is empty; build the index first")
+    manifest_path = Path("data/processed/index_manifests") / f"{collection}.json"
+    manifest = str(manifest_path) if manifest_path.is_file() else None
+    return collection, points, manifest
 
 
 def _log_summary(report: dict[str, Any]) -> None:

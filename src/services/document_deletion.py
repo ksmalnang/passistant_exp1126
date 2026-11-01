@@ -28,12 +28,18 @@ class DocumentDeletionService:
         document_tools: DocumentTools | None = None,
         cache: RedisCache | None = None,
         locks: DocumentLockRegistry | None = None,
+        graph_indexer: Any | None = None,
     ) -> None:
         if vector_store is None:
             from src.utils.vector_store import VectorStoreTools
 
             vector_store = VectorStoreTools()
+        if graph_indexer is None:
+            from src.graph.indexing import build_graph_chunk_indexer
+
+            graph_indexer = build_graph_chunk_indexer()
         self._vs = vector_store
+        self._graph_indexer = graph_indexer
         self._ocr_cache = ocr_cache if ocr_cache is not None else OCRCache()
         self._document_tools = document_tools if document_tools is not None else DocumentTools()
         self._cache = cache if cache is not None else get_cache()
@@ -59,6 +65,8 @@ class DocumentDeletionService:
             for document_id in document_ids:
                 raw_path = None if keep_files else self._resolve_raw_file(document_id)
                 self._vs.delete_document_chunks(document_id)
+                if self._graph_indexer is not None:
+                    self._graph_indexer.delete_document(document_id)
                 self._invalidate_search_cache(document_id)
                 if keep_files:
                     continue

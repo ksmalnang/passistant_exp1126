@@ -12,7 +12,7 @@ from src.clients.llm import get_response_llm
 from src.config import get_settings
 from src.guardrails.output_guard import OutputGuard
 from src.services.contracts import LLMProvider
-from src.utils.nodes.prompts import RESPONSE_SYSTEM_PROMPT
+from src.utils.nodes.prompts import GROUNDING_EDITOR_PROMPT, RESPONSE_SYSTEM_PROMPT
 from src.utils.state import AgentState, Citation
 
 logger = logging.getLogger(__name__)
@@ -291,6 +291,40 @@ class CitationBuilder:
         return f"{normalized[: self._SNIPPET_LIMIT].rstrip()}..."
 
 
+class GroundedAnswerEditor:
+    """Remove claims the retrieved excerpts do not directly support."""
+
+    _MAX_EXCERPT_CHARS = 12000
+
+    def __init__(
+        self,
+        llm_provider: LLMProvider = get_response_llm,
+        prompt: str | None = None,
+    ):
+        self._llm_provider = llm_provider
+        self._prompt = prompt or GROUNDING_EDITOR_PROMPT
+        self._llm = None
+
+    def edit(self, draft: str, excerpts: list[str]) -> str:
+        """Return the draft with unsupported sentences removed or rewritten."""
+        if not draft.strip() or not excerpts:
+            return draft
+        text = "\n\n".join(excerpts)[: self._MAX_EXCERPT_CHARS]
+        prompt = self._prompt.replace("{excerpts}", text).replace("{draft}", draft)
+        try:
+            response = self._get_llm().invoke(prompt)
+        except Exception as exc:
+            logger.warning("Grounding edit failed; returning the draft: %s", exc)
+            return draft
+        edited = str(response.content).strip()
+        return edited or draft
+
+    def _get_llm(self):
+        if self._llm is None:
+            self._llm = self._llm_provider()
+        return self._llm
+
+
 class ResponseGenerationService:
     """Generate assistant responses from current workflow state."""
 
@@ -308,12 +342,23 @@ class ResponseGenerationService:
         context_builder: ResponseContextBuilder | None = None,
         citation_builder: CitationBuilder | None = None,
         llm_provider: LLMProvider = get_response_llm,
+        system_prompt: str | None = None,
+        grounding_editor: GroundedAnswerEditor | None = None,
     ):
         self._context_builder = context_builder or ResponseContextBuilder()
         self._citation_builder = citation_builder or CitationBuilder()
         self._llm_provider = llm_provider
+        if system_prompt is None and get_settings().RESPONSE_PROMPT_FILE:
+            system_prompt = get_settings().RESPONSE_PROMPT_FILE.read_text(encoding="utf-8")
+        self._system_prompt = system_prompt
         self._output_guard = OutputGuard()
         self._llm = None
+        self._editor = grounding_editor
+        if self._editor is None and get_settings().GROUNDING_EDITOR_ENABLED:
+            prompt = None
+            if get_settings().GROUNDING_EDITOR_PROMPT_FILE:
+                prompt = get_settings().GROUNDING_EDITOR_PROMPT_FILE.read_text(encoding="utf-8")
+            self._editor = GroundedAnswerEditor(llm_provider=llm_provider, prompt=prompt)
 
     def generate(self, state: AgentState) -> dict[str, Any]:
         """Generate a response update for the workflow state."""
@@ -322,8 +367,12 @@ class ResponseGenerationService:
             context = self._context_builder.build(state, cited_chunks)
             citations = self._citation_builder.build(cited_chunks)
             response = self._invoke_response_llm(state, context, cited_chunks)
+            content = str(response.content)
+            if self._editor is not None:
+                excerpts = [str(chunk.get("text") or "") for chunk in cited_chunks]
+                content = self._editor.edit(content, [text for text in excerpts if text])
             response_content, active_citations = self._process_citations(
-                content=str(response.content),
+                content=content,
                 citations=citations,
             )
             response_content = self._output_guard.filter_response(response_content)
@@ -357,7 +406,8 @@ class ResponseGenerationService:
         if self._llm is None:
             return AIMessage(content=self._build_fallback_response(state, context, chunks))
 
-        system_msg = SystemMessage(content=RESPONSE_SYSTEM_PROMPT.format(context=context))
+        prompt = self._system_prompt or RESPONSE_SYSTEM_PROMPT
+        system_msg = SystemMessage(content=prompt.format(context=context))
         messages = [system_msg] + list(state.messages[-10:])
         return self._llm.invoke(messages)
 

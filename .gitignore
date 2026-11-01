@@ -79,8 +79,7 @@ qdrant_storage/
 .zed/
 
 # Assistant
-.agent
-.agents/
+.agent/assets
 
 # Evaluation Reports
 src/eval/reports/

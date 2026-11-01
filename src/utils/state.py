@@ -197,6 +197,7 @@ class AgentState(BaseModel):
         description="Document scope from the most recent retrieval turn ('all' or 'transcript').",
     )
     retrieval_warning: Optional[str] = Field(default=None)
+    graph_trace: dict[str, Any] = Field(default_factory=dict)
     quality_warning: Optional[str] = Field(default=None)
 
     # --- Response Generation ---

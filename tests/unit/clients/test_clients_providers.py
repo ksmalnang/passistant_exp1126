@@ -165,7 +165,7 @@ def test_unit_11_llm_without_provider_keeps_default_routing(
     llm = get_llm()
 
     assert llm is not None
-    assert llm.extra_body is None
+    assert llm.extra_body == {"reasoning": {"enabled": False}}
 
 
 def test_unit_02_closes_are_noops_before_initialization(

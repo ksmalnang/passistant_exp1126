@@ -111,6 +111,8 @@ class LivePipeline:
 
         retriever = VectorStoreTools()
         llm = get_response_llm()
+        # Evaluation aggregates the final text; a stalled stream must not hang the run.
+        llm.streaming = False
         if llm is None:
             raise RuntimeError(
                 "Live evaluation needs a response LLM. Set OPENAI_API_KEY (the OpenRouter key) "
@@ -128,9 +130,10 @@ class LivePipeline:
         provider = lambda: UsageTrackingChatModel(llm, self._usage)  # noqa: E731
         self._response_service = ResponseGenerationService(llm_provider=provider)
         logger.info(
-            "Live pipeline ready: strategy=%s, top_k=%d",
+            "Live pipeline ready: strategy=%s, top_k=%d, graph=%s",
             retriever.retrieval_strategy,
             self._retrieval_node.top_k,
+            self._retrieval_node.graph_expander is not None,
         )
 
     async def _run_sample(self, sample: DatasetSample) -> SampleResult:
@@ -154,4 +157,20 @@ class LivePipeline:
             sample=sample,
             response=response.get("draft_response") or "",
             retrieved_contexts=[context for context in contexts if context],
+            retrieved_chunks=[_chunk_record(chunk) for chunk in state.retrieved_chunks],
         )
+
+
+def _chunk_record(chunk: dict[str, Any]) -> dict[str, Any]:
+    locations = chunk.get("source_locations") or [{}]
+    return {
+        "chunk_id": chunk.get("chunk_id"),
+        "filename": chunk.get("filename"),
+        "page": locations[0].get("page"),
+        "score": chunk.get("score"),
+        "reranker_score": chunk.get("reranker_score"),
+        "vector_score": chunk.get("vector_score"),
+        "bm25_score": chunk.get("bm25_score"),
+        "origin": chunk.get("origin", "vector"),
+        "graph_entities": chunk.get("graph_entities", []),
+    }
