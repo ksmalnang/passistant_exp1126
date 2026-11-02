@@ -8,6 +8,7 @@ run as production code.
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator, Callable, Sequence
 from pathlib import Path
 from types import SimpleNamespace
@@ -154,6 +155,43 @@ class RecordingChatAgent:
             state=final_state,
         )
         yield AgentStreamUpdate(kind="final", state=final_state)
+
+
+class StoppableChatAgent(RecordingChatAgent):
+    """Block the first turn until released or cancelled, then allow follow-up turns."""
+
+    def __init__(self, session_id: str = "stop-test-thread") -> None:
+        super().__init__(session_id)
+        self.started = asyncio.Event()
+        self.release = asyncio.Event()
+        self.cleaned = asyncio.Event()
+        self.cancel_count = 0
+        self.block_next = True
+        self.final_state = AgentState(session_id=session_id, draft_response="Jawaban selesai.")
+
+    async def _wait(self) -> None:
+        if not self.block_next:
+            return
+        self.block_next = False
+        self.started.set()
+        try:
+            await self.release.wait()
+        except asyncio.CancelledError:
+            self.cancel_count += 1
+            raise
+        finally:
+            self.cleaned.set()
+
+    async def chat_with_state(self, message, files=None) -> AgentState:
+        self.chat_calls.append((message, files))
+        await self._wait()
+        return self.final_state
+
+    async def stream_chat(self, message, files=None) -> AsyncIterator[AgentStreamUpdate]:
+        self.stream_calls.append((message, files))
+        yield AgentStreamUpdate(kind="token", text="Jawaban awal. Bagian belum selesai")
+        await self._wait()
+        yield AgentStreamUpdate(kind="final", state=self.final_state)
 
 
 class LlmBackedChatAgent:

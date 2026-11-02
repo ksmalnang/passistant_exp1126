@@ -234,4 +234,5 @@ class CollectionOperations:
             points_selector=Filter(
                 must=[FieldCondition(key="document_id", match=MatchValue(value=document_id))]
             ),
+            wait=True,
         )

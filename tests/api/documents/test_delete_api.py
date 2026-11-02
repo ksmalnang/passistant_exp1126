@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from unittest.mock import Mock
 
 import httpx
 import pytest
@@ -46,6 +47,7 @@ class DeleteBackend:
     raw_dir: Path
     recording: _RecordingCache
     locks: DocumentLockRegistry
+    graph_indexer: Mock
 
 
 @pytest.fixture
@@ -63,12 +65,14 @@ def delete_backend(
     vector_store = _FakeDeletionVectorStore()
     recording = _RecordingCache()
     locks = DocumentLockRegistry()
+    graph_indexer = Mock()
     service = DocumentDeletionService(
         vector_store=vector_store,
         ocr_cache=cache,
         document_tools=document_tools,
         cache=recording,
         locks=locks,
+        graph_indexer=graph_indexer,
     )
     monkeypatch.setattr(documents, "get_document_deletion_service", lambda: service)
     return DeleteBackend(
@@ -77,6 +81,7 @@ def delete_backend(
         raw_dir=raw_dir,
         recording=recording,
         locks=locks,
+        graph_indexer=graph_indexer,
     )
 
 
@@ -94,6 +99,7 @@ async def test_delete_removes_chunks_cache_and_raw_file(
     assert response.status_code == 200
     assert response.json()["document_id"] == "doc-1"
     assert delete_backend.vector_store.deleted == ["doc-1"]
+    delete_backend.graph_indexer.delete_document.assert_called_once_with("doc-1")
     assert delete_backend.cache.exists("doc-1") is False
     assert raw_file.exists() is False
     assert "search:" in delete_backend.recording.prefixes
@@ -116,8 +122,28 @@ async def test_delete_keep_files_preserves_cache_and_raw_file(
 
     assert response.status_code == 200
     assert delete_backend.vector_store.deleted == ["doc-1"]
+    delete_backend.graph_indexer.delete_document.assert_called_once_with("doc-1")
     assert delete_backend.cache.exists("doc-1") is True
     assert raw_file.exists() is True
+    assert "search:" in delete_backend.recording.prefixes
+
+
+async def test_graph_outage_does_not_interrupt_delete_cleanup(
+    api_client: httpx.AsyncClient,
+    delete_backend: DeleteBackend,
+) -> None:
+    seed_ocr_cache(delete_backend.cache, document_id="doc-1", filename="handbook.pdf")
+    raw_file = delete_backend.raw_dir / "doc-1.pdf"
+    raw_file.write_bytes(b"%PDF raw")
+    delete_backend.vector_store.document_ids = {"doc-1"}
+    delete_backend.graph_indexer.delete_document.side_effect = ConnectionError("Neo4j offline")
+
+    response = await api_client.delete("/documents/by-filename/handbook.pdf")
+
+    assert response.status_code == 200
+    assert delete_backend.vector_store.deleted == ["doc-1"]
+    assert delete_backend.cache.exists("doc-1") is False
+    assert raw_file.exists() is False
     assert "search:" in delete_backend.recording.prefixes
 
 

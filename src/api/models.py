@@ -46,7 +46,19 @@ ChatStreamEventType = Literal[
     "message.delta",
     "run.completed",
     "run.failed",
+    "run.cancelled",
 ]
+
+
+ChatRunStatus = Literal["running", "completed", "failed", "cancelled"]
+
+
+class ChatCancelResponse(BaseModel):
+    """Terminal state of the chat run targeted by a Stop request."""
+
+    thread_id: str
+    run_id: str
+    status: Literal["completed", "failed", "cancelled"]
 
 
 class ChatStreamEvent(BaseModel):

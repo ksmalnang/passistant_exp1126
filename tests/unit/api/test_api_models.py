@@ -13,7 +13,7 @@ def test_unit_009_chat_stream_event_validates_event_type() -> None:
     """Supported stream event types pass; unknown types raise a validation error."""
     timestamp = datetime.now(UTC)
 
-    for event_type in ("run.started", "message.delta", "run.completed"):
+    for event_type in ("run.started", "message.delta", "run.completed", "run.cancelled"):
         event = ChatStreamEvent(
             event_id="run-1:1",
             event_type=event_type,

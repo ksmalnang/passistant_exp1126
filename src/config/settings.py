@@ -272,6 +272,15 @@ class Settings(BaseSettings):
     NEO4J_USER: str = Field(default="neo4j")
     NEO4J_PASSWORD: Optional[str] = Field(default=None)
     NEO4J_DATABASE: str = Field(default="neo4j")
+    GRAPH_SYNC_ENABLED: bool = Field(
+        default=True,
+        description="Sync the Qdrant knowledge base to Neo4j when credentials are configured",
+    )
+    GRAPH_SYNC_INTERVAL_SECONDS: float = Field(
+        default=60.0,
+        gt=0,
+        description="Interval between automatic Qdrant-to-Neo4j reconciliation passes",
+    )
     GRAPH_RAG_ENABLED: bool = Field(
         default=False,
         description="Enable Qdrant-seeded Neo4j graph expansion during retrieval",

@@ -51,7 +51,7 @@ class _FakeQdrant:
         self._events = events
         self.points: list = []
 
-    def upsert(self, collection_name: str, points: list) -> None:
+    def upsert(self, collection_name: str, points: list, *, wait: bool = True) -> None:
         self.points.extend(points)
         self._events.append(("upsert", len(points)))
 

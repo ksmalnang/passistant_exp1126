@@ -19,8 +19,13 @@ from fastapi import (
 )
 from fastapi.responses import StreamingResponse
 
-from src.api.models import ChatInput, ChatResponse, ErrorResponse
-from src.api.services import chat_service
+from src.api.models import ChatCancelResponse, ChatInput, ChatResponse, ErrorResponse
+from src.api.services import (
+    ChatRunCancelledError,
+    ChatRunMismatchError,
+    ChatRunNotFoundError,
+    chat_service,
+)
 from src.guardrails.input_guard import InputGuard
 
 _guard = InputGuard()
@@ -40,10 +45,7 @@ def _enforce_rate_limit(request: Request) -> None:
         )
 
 
-router = APIRouter(
-    dependencies=[Depends(_enforce_rate_limit)],
-    responses=ERROR_RESPONSES,
-)
+router = APIRouter()
 
 
 async def _chat_input(
@@ -54,9 +56,7 @@ async def _chat_input(
     """Parse the form and run the input guard once, for every chat route."""
     result = _guard.validate(message)
     if not result.safe:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, f"Message rejected: {result.reason}"
-        )
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Message rejected: {result.reason}")
     return ChatInput(
         message=result.sanitized or message.strip(),
         thread_id=thread_id,
@@ -76,20 +76,36 @@ def _sse(events: AsyncIterator[Any]) -> StreamingResponse:
     return StreamingResponse(encoded(), media_type="text/event-stream")
 
 
-@router.post("/chat", summary="Send a chat message (files optional)")
+@router.post(
+    "/chat",
+    summary="Send a chat message (files optional)",
+    dependencies=[Depends(_enforce_rate_limit)],
+    responses={
+        **ERROR_RESPONSES,
+        409: {"model": ErrorResponse, "description": "The chat run was cancelled."},
+    },
+)
 async def chat(data: ChatInputDep) -> ChatResponse:
     """Chat with the agent. Attached files are used as context for this turn only
     (they are not added to the shared retrieval index)."""
-    if data.files:
-        return await chat_service.handle_chat_upload(
-            message=data.message, files=data.files, thread_id=data.thread_id
+    try:
+        if data.files:
+            return await chat_service.handle_chat_upload(
+                message=data.message, files=data.files, thread_id=data.thread_id
+            )
+        return await chat_service.handle_chat_message(
+            message=data.message, thread_id=data.thread_id
         )
-    return await chat_service.handle_chat_message(
-        message=data.message, thread_id=data.thread_id
-    )
+    except ChatRunCancelledError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
 
 
-@router.post("/chat/stream", summary="Stream a chat message (files optional)")
+@router.post(
+    "/chat/stream",
+    summary="Stream a chat message (files optional)",
+    dependencies=[Depends(_enforce_rate_limit)],
+    responses=ERROR_RESPONSES,
+)
 async def chat_stream(data: ChatInputDep, request: Request) -> StreamingResponse:
     """Same as `/chat`, but replies with SSE events."""
     last_event_id = request.headers.get("Last-Event-ID") or request.query_params.get(
@@ -109,3 +125,21 @@ async def chat_stream(data: ChatInputDep, request: Request) -> StreamingResponse
             last_event_id=last_event_id,
         )
     return _sse(events)
+
+
+@router.post(
+    "/chat/{thread_id}/cancel",
+    summary="Stop the current chat run",
+    responses={
+        404: {"model": ErrorResponse, "description": "No retained run for this thread."},
+        409: {"model": ErrorResponse, "description": "The run_id targets a different run."},
+    },
+)
+async def cancel_chat(thread_id: str, run_id: str | None = None) -> ChatCancelResponse:
+    """Stop HTTP, SSE, or WebSocket generation; optionally guard against stale run IDs."""
+    try:
+        return await chat_service.cancel_run(thread_id, run_id)
+    except ChatRunNotFoundError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+    except ChatRunMismatchError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc

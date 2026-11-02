@@ -10,9 +10,9 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from langchain_core.messages import AIMessage
-from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, StateGraph
 
+from src.graphs.checkpointing import create_checkpointer
 from src.services.contracts import StateNode
 from src.services.followup import JevFollowUpClassifier
 from src.utils.nodes import (
@@ -290,7 +290,7 @@ def compile_app(checkpointer=None, nodes: WorkflowNodes | None = None):
 
     if checkpointer is None:
         # Use in-memory checkpointer for development
-        checkpointer = InMemorySaver()
+        checkpointer = create_checkpointer()
 
     app = workflow.compile(
         checkpointer=checkpointer,

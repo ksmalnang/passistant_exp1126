@@ -28,6 +28,7 @@ from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
 from src.config import configure_logging, get_settings
+from src.graphs.checkpointing import create_checkpointer
 from src.graphs.workflow import compile_app, get_compiled_app
 from src.services.contracts import AgentStreamUpdate
 from src.telemetry import current_run
@@ -98,7 +99,7 @@ class PASsistantAgent:
             self.app = get_compiled_app()
         else:
             graph_factory: Callable[..., Any] = app_factory or compile_app
-            self.checkpointer = checkpointer or InMemorySaver()
+            self.checkpointer = checkpointer or create_checkpointer()
             self.app = graph_factory(checkpointer=self.checkpointer)
 
         self.doc_processor = document_processor or get_document_processor()

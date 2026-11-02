@@ -4,7 +4,8 @@ import asyncio
 import logging
 import re
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator, AsyncIterator
+from contextlib import aclosing
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import partial
@@ -15,14 +16,16 @@ from langchain_core.messages import AIMessage
 
 from src.api.helpers import create_document_processor, read_upload_files
 from src.api.models import (
+    ChatCancelResponse,
     ChatResponse,
+    ChatRunStatus,
     ChatStreamEvent,
     DocumentIngestionResponse,
 )
 from src.api.sessions import session_manager
 from src.config.logging import reset_log_context, set_log_context
 from src.guardrails.output_guard import OutputGuard
-from src.services.contracts import ChatAgent, DocumentProcessor, SessionManager
+from src.services.contracts import AgentStreamUpdate, ChatAgent, DocumentProcessor, SessionManager
 from src.telemetry import current_run, end_run, start_run
 
 logger = logging.getLogger(__name__)
@@ -120,6 +123,18 @@ async def _to_file_tuples(files: UploadInput) -> FileTuples:
 # --------------------------------------------------------------------------- #
 # Chat
 # --------------------------------------------------------------------------- #
+class ChatRunNotFoundError(LookupError):
+    """No retained run exists for the requested thread."""
+
+
+class ChatRunMismatchError(ValueError):
+    """A stale Stop request targeted a different run in the same thread."""
+
+
+class ChatRunCancelledError(RuntimeError):
+    """A non-streaming request was stopped before its answer completed."""
+
+
 @dataclass(slots=True)
 class _RunStreamState:
     """Shared replay state for a streamed run."""
@@ -131,6 +146,12 @@ class _RunStreamState:
     subscribers: set[asyncio.Queue[ChatStreamEvent | None]] = field(default_factory=set)
     done: asyncio.Event = field(default_factory=asyncio.Event)
     sequence: int = 0
+    started: asyncio.Event = field(default_factory=asyncio.Event)
+    cancel_requested: bool = False
+    status: ChatRunStatus = "running"
+    streaming: bool = True
+    response: ChatResponse | None = None
+    exception: Exception | None = None
 
 
 class ChatRouteService:
@@ -141,9 +162,7 @@ class ChatRouteService:
         self._active_runs: dict[str, _RunStreamState] = {}
         self._run_lock = asyncio.Lock()
 
-    async def handle_chat_message(
-        self, message: str, thread_id: str | None = None
-    ) -> ChatResponse:
+    async def handle_chat_message(self, message: str, thread_id: str | None = None) -> ChatResponse:
         """Send a plain chat message to an agent session."""
         return await self._chat(message, None, thread_id)
 
@@ -175,22 +194,50 @@ class ChatRouteService:
     def encode_sse_event(self, event: ChatStreamEvent) -> str:
         """Encode a stream event as one SSE frame."""
         return (
-            f"id: {event.event_id}\nevent: {event.event_type}\n"
-            f"data: {event.model_dump_json()}\n\n"
+            f"id: {event.event_id}\nevent: {event.event_type}\ndata: {event.model_dump_json()}\n\n"
         )
 
     async def _chat(
         self, message: str, files: FileTuples | None, thread_id: str | None
     ) -> ChatResponse:
-        agent, active_thread_id = self._session_manager.get_or_create(thread_id)
-        state = await agent.chat_with_state(message, files=files)
-        return ChatResponse(
-            response=_response_text(state),
-            thread_id=active_thread_id,
-            intent=state.current_intent,
-            documents_processed=len(files or []),
-            citations=_citations(state),
+        run = await self._start_or_resume_run(
+            message=message,
+            files=files,
+            thread_id=thread_id,
+            last_event_id=None,
+            streaming=False,
         )
+        await run.done.wait()
+        if run.status == "cancelled":
+            raise ChatRunCancelledError(f"Chat run '{run.run_id}' was cancelled.")
+        if run.exception is not None:
+            raise run.exception
+        assert run.response is not None
+        return run.response
+
+    async def cancel_run(self, thread_id: str, run_id: str | None = None) -> ChatCancelResponse:
+        """Stop the current run once and wait for its cleanup and terminal event."""
+        async with self._run_lock:
+            run = self._active_runs.get(thread_id)
+            if run is None:
+                raise ChatRunNotFoundError(f"No chat run found for thread '{thread_id}'.")
+            if run_id is not None and run.run_id != run_id:
+                raise ChatRunMismatchError(
+                    "The requested run is no longer current for this thread."
+                )
+            should_cancel = not run.done.is_set() and not run.cancel_requested
+            if should_cancel:
+                run.cancel_requested = True
+
+        if should_cancel:
+            # Cancelling a task before its coroutine starts would skip its
+            # finally block. Let it enter first so cleanup always runs.
+            await run.started.wait()
+            if not run.done.is_set() and run.task is not None:
+                run.task.cancel()
+        await run.done.wait()
+        assert run.status != "running"
+        return ChatCancelResponse(thread_id=run.thread_id, run_id=run.run_id, status=run.status)
 
     async def _stream(
         self,
@@ -216,6 +263,7 @@ class ChatRouteService:
         files: FileTuples | None,
         thread_id: str | None,
         last_event_id: str | None,
+        streaming: bool = True,
     ) -> _RunStreamState:
         """Return an existing resumable run or start a new one."""
         agent, active_thread_id = self._session_manager.get_or_create(thread_id)
@@ -225,14 +273,14 @@ class ChatRouteService:
             self._active_runs = {
                 thread: run
                 for thread, run in self._active_runs.items()
-                if self._session_manager.contains(thread)
+                if not run.done.is_set() or self._session_manager.contains(thread)
             }
             existing = self._active_runs.get(active_thread_id)
             if existing is not None and (not existing.done.is_set() or last_event_id):
                 return existing
 
             run_state = _RunStreamState(
-                thread_id=active_thread_id, run_id=str(uuid.uuid4())
+                thread_id=active_thread_id, run_id=str(uuid.uuid4()), streaming=streaming
             )
             self._active_runs[active_thread_id] = run_state
             run_state.task = asyncio.create_task(
@@ -271,6 +319,7 @@ class ChatRouteService:
         files: FileTuples | None,
     ) -> None:
         """Drive agent streaming and broadcast normalized API events."""
+        run_state.started.set()
         append = partial(self._append_event, run_state)
         guard = OutputGuard()
         emitted_text = ""
@@ -314,45 +363,65 @@ class ChatRouteService:
         )
 
         try:
-            async for update in agent.stream_chat(message, files=files):
-                if update.kind == "token":
-                    await emit_answer_text(update.text)
-                elif update.kind == "final":
-                    final_state = update.state
-                    if streamed_response:
-                        await emit_answer_text("", final=True)
-                elif update.kind == "status":
-                    stage = update.node or "workflow"
-                    duration_ms = telemetry.record_stage(stage)
-                    logger.info(
-                        "Stage %s finished in %d ms",
-                        stage,
-                        duration_ms,
-                        extra={"event": "stage", "stage": stage, "duration_ms": duration_ms},
-                    )
-                    await append(
-                        "run.status",
-                        {
-                            "stage": stage,
-                            "label": _stage_label(update.node),
-                            "meta": update.payload,
-                        },
-                    )
-                    if update.state is not None and not streamed_response:
-                        await emit_delta(_assistant_text(update.state) or "")
+            if run_state.cancel_requested:
+                raise asyncio.CancelledError
+            async with aclosing(
+                self._agent_updates(agent, message, files, run_state.streaming)
+            ) as updates:
+                async for update in updates:
+                    if run_state.cancel_requested:
+                        raise asyncio.CancelledError
+                    if update.kind == "token":
+                        await emit_answer_text(update.text)
+                    elif update.kind == "final":
+                        final_state = update.state
+                        if streamed_response:
+                            await emit_answer_text("", final=True)
+                    elif update.kind == "status":
+                        stage = update.node or "workflow"
+                        duration_ms = telemetry.record_stage(stage)
+                        logger.info(
+                            "Stage %s finished in %d ms",
+                            stage,
+                            duration_ms,
+                            extra={"event": "stage", "stage": stage, "duration_ms": duration_ms},
+                        )
+                        await append(
+                            "run.status",
+                            {
+                                "stage": stage,
+                                "label": _stage_label(update.node),
+                                "meta": update.payload,
+                            },
+                        )
+                        if update.state is not None and not streamed_response:
+                            await emit_delta(_assistant_text(update.state) or "")
 
+            if run_state.cancel_requested:
+                raise asyncio.CancelledError
             if final_state is None:
                 final_state = await agent.chat_with_state(message, files=files)
+            if run_state.cancel_requested:
+                raise asyncio.CancelledError
             response_text = _response_text(final_state)
             if not streamed_response:
                 await emit_delta(response_text)
 
             intent = getattr(final_state, "current_intent", None)
+            run_state.response = ChatResponse(
+                response=response_text,
+                thread_id=run_state.thread_id,
+                intent=intent,
+                documents_processed=len(files or []),
+                citations=_citations(final_state),
+            )
             if error := getattr(final_state, "error", None):
                 outcome = "failed"
+                run_state.status = "failed"
                 await fail(str(error))
             else:
                 outcome = "completed"
+                run_state.status = "completed"
                 await append(
                     "run.completed",
                     {
@@ -365,9 +434,18 @@ class ChatRouteService:
                         ],
                     },
                 )
-        except Exception:
+        except asyncio.CancelledError:
+            outcome = "cancelled"
+            run_state.status = "cancelled"
+            await append(
+                "run.cancelled", {"message": "Chat run stopped.", "response": emitted_text}
+            )
+            raise
+        except Exception as exc:
             # Details go to the logs, not to the client.
             outcome = "failed"
+            run_state.status = "failed"
+            run_state.exception = exc
             logger.error("Streaming run failed", exc_info=True)
             await fail("The chat run failed unexpectedly.")
         finally:
@@ -391,6 +469,23 @@ class ChatRouteService:
             run_state.done.set()
             for subscriber in list(run_state.subscribers):
                 await subscriber.put(None)
+
+    async def _agent_updates(
+        self, agent: ChatAgent, message: str, files: FileTuples | None, streaming: bool
+    ) -> AsyncGenerator[AgentStreamUpdate, None]:
+        """Keep the existing agent entry point for each transport."""
+        if streaming:
+            stream = agent.stream_chat(message, files=files)
+            try:
+                async for update in stream:
+                    yield update
+            finally:
+                close = getattr(stream, "aclose", None)
+                if close is not None:
+                    await close()
+        else:
+            state = await agent.chat_with_state(message, files=files)
+            yield AgentStreamUpdate(kind="final", state=state)
 
     async def _append_event(
         self,
@@ -420,9 +515,7 @@ chat_service = ChatRouteService(session_manager=session_manager)
 # --------------------------------------------------------------------------- #
 # Document ingestion
 # --------------------------------------------------------------------------- #
-async def _ingest_one(
-    processor: DocumentProcessor, file: UploadFile
-) -> DocumentIngestionResponse:
+async def _ingest_one(processor: DocumentProcessor, file: UploadFile) -> DocumentIngestionResponse:
     filename = file.filename or "upload"
     try:
         document = await processor.ingest_upload(await file.read(), filename)

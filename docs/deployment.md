@@ -152,6 +152,20 @@ curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
 uv run python -m src.telegram_bot.polling
 ```
 
+## Neo4j synchronization
+
+After `uv sync --all-extras`, configure `NEO4J_URI`, `NEO4J_USER`,
+`NEO4J_PASSWORD`, and `NEO4J_DATABASE`, then restart the API. With
+`GRAPH_SYNC_ENABLED=true` (default), document mutations update Neo4j immediately;
+the API also reconciles Qdrant at startup and every
+`GRAPH_SYNC_INTERVAL_SECONDS` (default 60). `GRAPH_RAG_ENABLED` controls retrieval
+only. No LLM extraction is run by automatic sync.
+
+The Neo4j database must be dedicated to `QDRANT_COLLECTION_NAME`, as graph-only
+documents are removed during reconciliation. Writes across services/workers are
+eventually consistent. See [GraphRAG synchronization](graphrag.md#automatic-synchronization)
+for failure recovery and optional policy extraction.
+
 ## LangGraph Platform
 
 ```bash

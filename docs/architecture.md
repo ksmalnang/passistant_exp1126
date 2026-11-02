@@ -84,16 +84,31 @@ sequenceDiagram
 
 ## SSE Streaming Support
 
-The FastAPI layer supports streaming interactions via Server-Sent Events (SSE). It emits 5 event types during a run:
+The FastAPI layer supports streaming interactions via Server-Sent Events (SSE). It emits 6 event types during a run:
 1. `run.started`
 2. `run.status`
 3. `message.delta`
 4. `run.completed`
 5. `run.failed`
+6. `run.cancelled`
 
 It also supports seamless resumption using the `Last-Event-ID` header or query parameter.
+HTTP, SSE, and WebSocket chat runs share the same process-local registry.
+`POST /chat/{thread_id}/cancel` cancels the workflow task, closes its agent
+iterator, and publishes a terminal cancellation event. Disconnecting a subscriber
+preserves the run for replay. See [Stop API](api.md#post-chatthread_idcancel--stop)
+for run-ID checks and cooperative-cancellation limits.
 
 ## Key Design Decisions
+
+### Checkpoint Serialization
+
+Default in-memory checkpointers share the factory in `src/graphs/checkpointing.py`.
+Its `JsonPlusSerializer` explicitly allows PASsistant's state models, including
+`Citation`, `DocumentUpload`, and `StudentRecord`. Checkpoint reads preserve these
+types without unregistered-type warnings, including with
+`LANGGRAPH_STRICT_MSGPACK=true`. Caller-injected checkpointers retain their own
+serializer configuration.
 
 ### Chunked Document Indexing
 

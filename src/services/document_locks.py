@@ -46,3 +46,8 @@ class DocumentLockRegistry:
 
 
 document_locks = DocumentLockRegistry()
+
+# Keep Qdrant mutations and graph reconciliation in the same order inside a
+# process. Embedding/OCR work happens outside this lock. Like document_locks,
+# this does not coordinate independent API workers or external database writers.
+knowledge_base_lock = threading.RLock()

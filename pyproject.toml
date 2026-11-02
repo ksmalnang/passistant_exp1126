@@ -16,6 +16,7 @@ dependencies = [
     "langchain-core==1.3.2",
     "langchain-openai==1.2.1",
     "qdrant-client[fastembed]>=1.17.1",
+    "neo4j>=6.4.1,<7",
     "httpx>=0.28.1",
     "pydantic>=2.13.3",
     "pydantic-settings>=2.14.0",
@@ -92,6 +93,7 @@ markers = [
 [tool.basedpyright]
 pythonVersion = "3.11"
 include = ["src"]
-exclude = ["tests", ".venv", ".agent", "src/eval"]
+exclude = ["tests", ".venv", "**/__pycache__", ".agent", "src/eval"]
+venvPath = "."
 reportUnusedImport = true
-typeCheckingMode = "basic"
+typeCheckingMode = "standard"

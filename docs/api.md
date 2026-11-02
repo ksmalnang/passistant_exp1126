@@ -27,7 +27,8 @@ uv run uvicorn src.api:app --reload --port 8000
   `TELEGRAM_WEBHOOK_SECRET_TOKEN`.
 - Chat requests and reindex endpoints are rate-limited by client IP. The
   default is 20 requests per minute (`RATE_LIMIT_PER_MINUTE`). WebSocket
-  messages are checked against the same limiter.
+  messages are checked against the same limiter. Chat cancellation remains
+  available when this limit has been exhausted.
 - Most errors use FastAPI's standard JSON shape: `{"detail":"..."}`. Chat
   guardrail rejections return `400`; rate limits return `429`.
 - The current CORS middleware allows `GET`, `POST`, and `OPTIONS`, with
@@ -41,6 +42,7 @@ uv run uvicorn src.api:app --reload --port 8000
 | `GET` | `/health` | API and dependency health | Public |
 | `POST` | `/chat` | Chat request; optional files are used for this turn only | Rate-limited |
 | `POST` | `/chat/stream` | Chat response as Server-Sent Events (SSE) | Rate-limited |
+| `POST` | `/chat/{thread_id}/cancel` | Stop the current HTTP/SSE/WebSocket chat run | Public |
 | `POST` | `/upload` | OCR and ingest PDF/image files into the shared index | Public |
 | `GET` | `/documents` | List indexed documents | Public |
 | `DELETE` | `/documents/by-filename/{filename}` | Delete indexed documents by filename | Public |
@@ -103,7 +105,10 @@ items may include `id`, `document_id`, `filename`, `title`, `section`, `page`,
 `formatted` is the ready-to-display IEEE-style reference string for that citation.
 
 Common responses include `400` when the input guard rejects a message, `422`
-for invalid form data, and `429` when the rate limit is exceeded.
+for invalid form data, and `429` when the rate limit is exceeded. A request
+stopped through the cancellation endpoint returns `409` with a cancellation
+detail. Supply your own `thread_id` when starting a non-streaming request if
+you need to stop it before its response arrives.
 
 ### `POST /chat/stream`
 
@@ -135,6 +140,7 @@ Event names and their `data` fields:
 | `message.delta` | `text`, `index` |
 | `run.completed` | `response`, `intent`, `documents_processed`, `citations` |
 | `run.failed` | `code`, `message`, `retryable` |
+| `run.cancelled` | `message`, `response` (safe partial text already emitted) |
 
 Example request:
 
@@ -148,6 +154,42 @@ To resume an in-memory run, send the last received event ID using either the
 `Last-Event-ID` header or the `last_event_id` query parameter. Event IDs have
 the form `<run_id>:<sequence>`. Replay state is process-local and is lost when
 the API process restarts.
+
+### `POST /chat/{thread_id}/cancel` — Stop
+
+Stop the current run for a thread, whether it was started through `/chat`,
+`/chat/stream`, or `/ws/{thread_id}`. Use a separate HTTP request while the
+original connection is still open. The optional `run_id` query parameter must
+match the current run; streaming clients should always pass the ID received in
+`run.started` to prevent a delayed Stop from cancelling the next turn.
+
+```bash
+curl -X POST "http://localhost:8000/chat/my-thread-id/cancel?run_id=run-uuid"
+```
+
+```json
+{"thread_id": "my-thread-id", "run_id": "run-uuid", "status": "cancelled"}
+```
+
+The response waits for workflow cancellation and cleanup. All SSE/WebSocket
+subscribers receive one terminal `run.cancelled` event; no `run.completed`
+event follows for that run. `data.response` contains only partial text already
+published through the output guard. The original non-streaming `/chat` request
+returns `409`. The thread remains usable: send the next message without a
+resume cursor to start a new run. A cancelled run can still be replayed with
+its last event ID until another run replaces it.
+
+Repeated Stop requests are idempotent. If a run already completed or failed,
+`200` returns its actual `completed` or `failed` status. A thread with no retained run
+returns `404`; a mismatched `run_id` returns `409` without cancelling anything.
+There is one active run per thread; simultaneous requests subscribe to or await
+that run.
+
+Cancellation is cooperative: synchronous work already running in worker threads
+and requests already sent to an upstream provider may finish independently.
+Their late results are not published as a completed chat response. Run state is
+process-local, so cancellation requests must reach the same API worker as the
+original run (use one worker or sticky routing).
 
 ## Documents
 
@@ -270,6 +312,12 @@ The server sends JSON-encoded `ChatStreamEvent` objects using the same event
 names as `/chat/stream`. WebSocket chat currently accepts text only (no file
 attachments). Rate-limit or input-guard rejections are returned as a
 `run.failed` event.
+
+Client disconnects stop socket delivery without sending further events or another
+close frame. The chat run remains available for replay; reconnect with
+`last_event_id` to resume the buffered stream. To stop generation explicitly,
+call `POST /chat/{thread_id}/cancel?run_id=...` while keeping the socket open;
+the socket receives `run.cancelled` and can then accept the next chat message.
 
 ## Health check
 

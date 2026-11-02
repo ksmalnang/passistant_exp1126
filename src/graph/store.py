@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
-from typing import Any
+from typing import Any, LiteralString, cast
 
 from neo4j import GraphDatabase
 
@@ -57,7 +57,7 @@ class GraphStore:
         self._driver.verify_connectivity()
 
     def ensure_schema(self) -> None:
-        statements = [
+        statements: list[LiteralString] = [
             "CREATE CONSTRAINT chunk_id_unique IF NOT EXISTS "
             "FOR (c:Chunk) REQUIRE c.chunk_id IS UNIQUE",
             "CREATE CONSTRAINT entity_id_unique IF NOT EXISTS "
@@ -80,12 +80,16 @@ class GraphStore:
     ) -> None:
         """Replace one chunk and its extraction, so re-ingestion is idempotent."""
         chunk_id = chunk["chunk_id"]
-        with self._driver.session(database=self.database) as session:
-            session.run(
+        with (
+            self._driver.session(database=self.database) as session,
+            session.begin_transaction() as transaction,
+        ):
+            self._delete_chunk_relationships(transaction, [chunk_id])
+            transaction.run(
                 "MATCH (c:Chunk {chunk_id: $chunk_id}) DETACH DELETE c",
                 chunk_id=chunk_id,
             ).consume()
-            session.run(
+            transaction.run(
                 """
                 MERGE (d:Document {document_id: $document_id})
                 SET d.filename = $filename, d.title = $title
@@ -108,7 +112,7 @@ class GraphStore:
                 text_hash=text_hash(chunk.get("text") or ""),
             ).consume()
             if entities:
-                session.run(
+                transaction.run(
                     """
                     UNWIND $entities AS row
                     MERGE (e:Entity {entity_id: row.entity_id})
@@ -126,16 +130,22 @@ class GraphStore:
                 ).consume()
             for relationship_type, rows in _group_by_type(relationships).items():
                 if relationship_type not in ALLOWED_RELATIONSHIP_TYPES:
-                    logger.warning("Skipping unsupported graph relationship type: %s", relationship_type)
+                    logger.warning(
+                        "Skipping unsupported graph relationship type: %s", relationship_type
+                    )
                     continue
-                session.run(
-                    f"""
+                # The only interpolated value was checked against the allow-list.
+                transaction.run(
+                    cast(
+                        LiteralString,
+                        f"""
                     UNWIND $rows AS row
                     MATCH (a:Entity {{entity_id: row.source}})
                     MATCH (b:Entity {{entity_id: row.target}})
                     MERGE (a)-[r:{relationship_type} {{source_chunk_id: $chunk_id}}]->(b)
                     SET r.evidence = row.evidence, r.confidence = row.confidence
                     """,
+                    ),
                     rows=rows,
                     chunk_id=chunk_id,
                 ).consume()
@@ -146,37 +156,81 @@ class GraphStore:
             session.run("MATCH (n) DETACH DELETE n").consume()
 
     def delete_document(self, document_id: str) -> None:
-        with self._driver.session(database=self.database) as session:
-            session.run(
-                """
-                MATCH (d:Document {document_id: $document_id})
-                OPTIONAL MATCH (d)-[:HAS_CHUNK]->(c:Chunk)
-                DETACH DELETE c, d
-                """,
+        with (
+            self._driver.session(database=self.database) as session,
+            session.begin_transaction() as transaction,
+        ):
+            chunk_ids = [
+                row["chunk_id"]
+                for row in transaction.run(
+                    "MATCH (c:Chunk {document_id: $document_id}) RETURN c.chunk_id AS chunk_id",
+                    document_id=document_id,
+                )
+            ]
+            self._delete_chunks(transaction, chunk_ids)
+            transaction.run(
+                "MATCH (d:Document {document_id: $document_id}) DETACH DELETE d",
                 document_id=document_id,
             ).consume()
-            self._delete_orphan_entities(session)
+            self._delete_orphan_entities(transaction)
 
     def prune_document_chunks(self, document_id: str, keep_chunk_ids: list[str]) -> None:
         """Remove graph chunks from a document that no longer exist in Qdrant."""
-        with self._driver.session(database=self.database) as session:
-            session.run(
-                """
-                MATCH (c:Chunk {document_id: $document_id})
-                WHERE NOT c.chunk_id IN $keep
-                DETACH DELETE c
-                """,
-                document_id=document_id,
-                keep=keep_chunk_ids,
-            ).consume()
+        with (
+            self._driver.session(database=self.database) as session,
+            session.begin_transaction() as transaction,
+        ):
+            chunk_ids = [
+                row["chunk_id"]
+                for row in transaction.run(
+                    """
+                    MATCH (c:Chunk {document_id: $document_id})
+                    WHERE NOT c.chunk_id IN $keep
+                    RETURN c.chunk_id AS chunk_id
+                    """,
+                    document_id=document_id,
+                    keep=keep_chunk_ids,
+                )
+            ]
+            self._delete_chunks(transaction, chunk_ids)
+            self._delete_orphan_entities(transaction)
 
     def delete_chunk(self, chunk_id: str) -> None:
+        with (
+            self._driver.session(database=self.database) as session,
+            session.begin_transaction() as transaction,
+        ):
+            self._delete_chunks(transaction, [chunk_id])
+            self._delete_orphan_entities(transaction)
+
+    def document_ids(self) -> set[str]:
+        """Include documents whose HAS_CHUNK links are missing after an old failure."""
         with self._driver.session(database=self.database) as session:
-            session.run(
-                "MATCH (c:Chunk {chunk_id: $chunk_id}) DETACH DELETE c",
-                chunk_id=chunk_id,
-            ).consume()
-            self._delete_orphan_entities(session)
+            return {
+                row["document_id"]
+                for row in session.run(
+                    """
+                    MATCH (n) WHERE n:Document OR n:Chunk
+                    RETURN DISTINCT n.document_id AS document_id
+                    """
+                )
+                if row["document_id"]
+            }
+
+    def document_chunks(self, document_id: str) -> dict[str, dict[str, Any]]:
+        """Read source fields so unchanged chunks retain their optional LLM extraction."""
+        with self._driver.session(database=self.database) as session:
+            result = session.run(
+                """
+                MATCH (d:Document {document_id: $document_id})-[:HAS_CHUNK]->
+                      (c:Chunk {document_id: $document_id})
+                RETURN c.chunk_id AS chunk_id, c.document_id AS document_id,
+                       c.filename AS filename, d.title AS doc_title, c.page AS page,
+                       c.chunk_index AS chunk_index, c.text AS text
+                """,
+                document_id=document_id,
+            )
+            return {row["chunk_id"]: dict(row) for row in result}
 
     def seed_entities(
         self,
@@ -340,33 +394,59 @@ class GraphStore:
 
     def chunk_ids(self) -> set[str]:
         with self._driver.session(database=self.database) as session:
-            return {row["chunk_id"] for row in session.run("MATCH (c:Chunk) RETURN c.chunk_id AS chunk_id")}
+            return {
+                row["chunk_id"]
+                for row in session.run("MATCH (c:Chunk) RETURN c.chunk_id AS chunk_id")
+            }
 
     def consistency_report(self, qdrant_chunk_ids: set[str]) -> dict[str, Any]:
         graph_ids = self.chunk_ids()
         with self._driver.session(database=self.database) as session:
-            missing_provenance = session.run(
+            provenance = session.run(
                 """
                 MATCH (c:Chunk)-[m:MENTIONS]->(e:Entity)
                 WHERE m.evidence IS NULL OR m.evidence = ''
                 RETURN count(m) AS count
                 """
-            ).single()["count"]
+            ).single()
         return {
             "qdrant_chunks": len(qdrant_chunk_ids),
             "graph_chunks": len(graph_ids),
             "missing_in_graph": sorted(qdrant_chunk_ids - graph_ids)[:20],
             "orphaned_in_graph": sorted(graph_ids - qdrant_chunk_ids)[:20],
-            "mentions_without_provenance": missing_provenance,
+            "mentions_without_provenance": provenance["count"] if provenance else 0,
         }
 
     def _delete_orphan_entities(self, session) -> None:
+        # Entity-to-entity edges survive DETACH DELETE of a Chunk. Clean legacy
+        # edges too, including those between entities still used by other chunks.
+        session.run(
+            """
+            MATCH ()-[r]->()
+            WHERE r.source_chunk_id IS NOT NULL
+              AND NOT EXISTS { MATCH (c:Chunk) WHERE c.chunk_id = r.source_chunk_id }
+            DELETE r
+            """
+        ).consume()
         session.run(
             """
             MATCH (e:Entity)
             WHERE NOT (e)<-[:MENTIONS]-(:Chunk)
             DETACH DELETE e
             """
+        ).consume()
+
+    def _delete_chunk_relationships(self, session, chunk_ids: list[str]) -> None:
+        session.run(
+            "MATCH ()-[r]->() WHERE r.source_chunk_id IN $chunk_ids DELETE r",
+            chunk_ids=chunk_ids,
+        ).consume()
+
+    def _delete_chunks(self, session, chunk_ids: list[str]) -> None:
+        self._delete_chunk_relationships(session, chunk_ids)
+        session.run(
+            "MATCH (c:Chunk) WHERE c.chunk_id IN $chunk_ids DETACH DELETE c",
+            chunk_ids=chunk_ids,
         ).consume()
 
 

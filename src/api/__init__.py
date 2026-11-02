@@ -34,6 +34,7 @@ from src.config import (
     set_log_context,
 )
 from src.guardrails.rate_limit import InMemoryRateLimiter
+from src.services.graph_sync import graph_sync_lifespan
 from src.utils.vector_store import VectorStoreTools
 
 configure_logging()
@@ -84,7 +85,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     finally:
         reset_log_context(startup_token)
 
-    yield
+    async with graph_sync_lifespan():
+        yield
 
     shutdown_token = set_log_context(phase="shutdown")
     try:
@@ -167,7 +169,10 @@ app.include_router(router)
 def _patch_binary_upload_schemas(node):
     """Convert OpenAPI 3.1 contentMediaType upload schemas into Swagger-friendly binary schemas."""
     if isinstance(node, dict):
-        if node.get("type") == "string" and node.get("contentMediaType") == "application/octet-stream":
+        if (
+            node.get("type") == "string"
+            and node.get("contentMediaType") == "application/octet-stream"
+        ):
             node.pop("contentMediaType", None)
             node["format"] = "binary"
         for value in node.values():

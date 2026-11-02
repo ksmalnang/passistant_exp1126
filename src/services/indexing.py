@@ -12,6 +12,7 @@ from qdrant_client.http.models import PointStruct
 
 from src.clients.redis import RedisCache, get_cache
 from src.config import get_settings
+from src.services.document_locks import knowledge_base_lock
 from src.utils.state import DocumentUpload
 
 logger = logging.getLogger(__name__)
@@ -124,10 +125,11 @@ class DocumentIndexingService:
         # Chunks and embeddings are ready before old points are removed, so a
         # failure during embedding cannot delete the previous index in place.
         points = await self._build_points(chunks, document)
-        if replace_existing:
-            self._vs.delete_document_chunks(document.document_id)
-        self._upsert_points(points)
-        graph_issues = self._sync_graph(document.document_id, points)
+        with knowledge_base_lock:
+            if replace_existing:
+                self._vs.delete_document_chunks(document.document_id)
+            self._upsert_points(points)
+            graph_issues = self._sync_graph(document.document_id, points)
 
         self._invalidate_document_cache(document.document_id)
 
@@ -152,19 +154,14 @@ class DocumentIndexingService:
         """Mirror chunk identity and deterministic entities into Neo4j when enabled."""
         if self._graph_indexer is None:
             return []
-        chunks = [
-            {
-                "chunk_id": point.payload["chunk_id"],
-                "text": point.payload["text"],
-                "document_id": point.payload["document_id"],
-                "filename": point.payload.get("filename"),
-                "doc_title": point.payload.get("doc_title"),
-                "chunk_index": point.payload.get("chunk_index"),
-                "page": (point.payload.get("source_locations") or [{}])[0].get("page"),
-            }
-            for point in points
-        ]
-        return self._graph_indexer.replace_document(document_id, chunks)
+        from src.graph.indexing import chunk_from_payload
+
+        try:
+            chunks = [chunk_from_payload(point.payload or {}) for point in points]
+            return self._graph_indexer.replace_document(document_id, chunks)
+        except Exception as exc:
+            logger.warning("Graph sync deferred for document %s: %s", document_id, exc)
+            return [f"Graph sync deferred; automatic reconciliation will retry: {exc}"]
 
     def _build_page_boundaries(self, document: DocumentUpload) -> list[tuple[int, int]]:
         """Build a list of (start_offset, end_offset) pairs per page.
@@ -300,6 +297,7 @@ class DocumentIndexingService:
             self._vs.client.upsert(
                 collection_name=self._vs.collection_name,
                 points=batch,
+                wait=True,
             )
 
     def _invalidate_document_cache(self, document_id: str) -> None:

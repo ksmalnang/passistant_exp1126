@@ -164,6 +164,7 @@ uv run python -m src.telegram_bot.polling
 | `GET` | `/health` | API and dependency health |
 | `POST` | `/chat` | Chat request, optionally with turn-only file context |
 | `POST` | `/chat/stream` | Streaming chat (SSE), optionally with files |
+| `POST` | `/chat/{thread_id}/cancel` | Stop an HTTP, SSE, or WebSocket chat run |
 | `POST` | `/upload` | Upload and ingest documents into the shared index |
 | `GET` | `/documents` | List ingested documents |
 | `DELETE` | `/documents/by-filename/{filename}` | Delete indexed documents by filename |
@@ -265,7 +266,12 @@ See [docs/evaluation.md](docs/evaluation.md) for the full evaluation guide.
 ### GraphRAG (Qdrant + Neo4j)
 
 An optional graph-augmented retrieval path links Qdrant chunks to Neo4j by the exact
-`chunk_id`. Build the graph from the same PDFs, then enable expansion:
+`chunk_id`. With Neo4j credentials configured, uploads, reindexing, and deletions
+automatically synchronize the graph (`GRAPH_SYNC_ENABLED=true`), even when graph
+retrieval is disabled. The API also reconciles existing Qdrant data at startup and
+every 60 seconds (`GRAPH_SYNC_INTERVAL_SECONDS`) to repair missed or external changes.
+New chunks get deterministic extraction without LLM calls. For optional policy
+extraction, build from the indexed Qdrant chunks, then enable expansion:
 
 ```bash
 uv run python scripts/build_kb_graph.py --collection passistant_eval_v1 \

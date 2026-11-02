@@ -11,6 +11,7 @@ from src.services.document_locks import (
     DocumentLockedError,
     DocumentLockRegistry,
     document_locks,
+    knowledge_base_lock,
 )
 from src.services.ocr_cache import OCRCache
 from src.utils.tools.document import DocumentTools
@@ -64,9 +65,18 @@ class DocumentDeletionService:
 
             for document_id in document_ids:
                 raw_path = None if keep_files else self._resolve_raw_file(document_id)
-                self._vs.delete_document_chunks(document_id)
-                if self._graph_indexer is not None:
-                    self._graph_indexer.delete_document(document_id)
+                with knowledge_base_lock:
+                    self._vs.delete_document_chunks(document_id)
+                    if self._graph_indexer is not None:
+                        try:
+                            self._graph_indexer.delete_document(document_id)
+                        except Exception as exc:
+                            logger.warning(
+                                "Graph deletion deferred for document %s; "
+                                "automatic reconciliation will retry: %s",
+                                document_id,
+                                exc,
+                            )
                 self._invalidate_search_cache(document_id)
                 if keep_files:
                     continue

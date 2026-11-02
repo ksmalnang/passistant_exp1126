@@ -41,6 +41,15 @@ SERVER_SHUTDOWN_TIMEOUT_SECONDS = 10.0
 _SCRATCH_ROOT = Path(".tmp_tests")
 
 
+@pytest.fixture(autouse=True)
+def offline_graph_sync(monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest) -> None:
+    """Local Neo4j credentials must not enable real writes in offline tests."""
+    if request.node.get_closest_marker("system") is None:
+        from src.config import get_settings
+
+        monkeypatch.setattr(get_settings(), "GRAPH_SYNC_ENABLED", False)
+
+
 @pytest.fixture
 def tmp_path() -> Iterator[Path]:
     """Workspace-local tmp_path; the system temp dir is not writable everywhere.

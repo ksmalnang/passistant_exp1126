@@ -34,6 +34,42 @@ chunks; graph edges are never passed to the generator as standalone facts.
 - `GraphStore.consistency_report` compares the Qdrant chunk-id set with Neo4j and
   reports missing/orphaned chunks and mentions without provenance.
 
+## Automatic synchronization
+
+`GRAPH_SYNC_ENABLED=true` (default) synchronizes the graph whenever
+`NEO4J_PASSWORD` is configured, independently of `GRAPH_RAG_ENABLED`. Disabling
+graph expansion during retrieval no longer stops graph maintenance.
+
+- Upload and OCR-cache reindex mirror the successfully written Qdrant chunks to
+  Neo4j, preserving the exact `chunk_id` and source page. Schema constraints are
+  initialized automatically; an initial manual build is unnecessary.
+- Document deletion removes the corresponding graph chunks, their sourced
+  entity relationships, and orphan entities, including with `keep_files=true`.
+- While the FastAPI server is running, a background pass starts at startup and
+  repeats every `GRAPH_SYNC_INTERVAL_SECONDS` (default 60). It reads the current
+  Qdrant collection, repairs missing/changed chunks, and removes graph documents
+  no longer present there. This also catches changes made directly in Qdrant.
+- Neo4j failure does not undo a successful Qdrant write or interrupt file/cache
+  cleanup. Upload/reindex reports a graph issue; deletion and reconciliation log
+  failures. A later background pass retries from Qdrant, including after restart.
+  Failed Qdrant reads never authorize graph deletion.
+- Unchanged chunks keep their existing extraction, including manually built LLM
+  policy links. Changed/new chunks receive deterministic extraction only; sync
+  does not call OCR, embedding, or LLM providers. Policy extraction for new text
+  remains an explicit `--llm-extract` build.
+
+Configure `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, and `NEO4J_DATABASE`, then
+restart the API after upgrading (`uv sync --all-extras`). Set
+`GRAPH_SYNC_ENABLED=false` to stop automatic maintenance. CLI/polling ingestion
+still runs the immediate hooks; periodic repair requires the API server.
+
+Use a dedicated Neo4j database for the configured `QDRANT_COLLECTION_NAME`.
+Reconciliation treats that collection as authoritative for all graph documents;
+do not share the database with graphs from other collections. In-process locks
+coordinate reconciliation with API writes. Independent workers and direct
+database writers are eventually reconciled on subsequent passes; there is no
+cross-database transaction or distributed locking.
+
 ## Ontology
 
 Entities:
@@ -158,8 +194,9 @@ Candidate B/C scores are blocked pending a working judge quota; see
 
 ## Limitations
 
-- Neo4j is a derived store; if it is stale, disable graph retrieval and rebuild
-  from Qdrant with `scripts/build_kb_graph.py`.
+- Neo4j is a derived store; automatic repair requires configured credentials and
+  a running API server. `scripts/build_kb_graph.py` remains available for explicit
+  rebuilds and optional LLM policy extraction.
 - LLM extraction is sampled (`--max-llm-chunks`); chunks outside the sample only
   receive deterministic links. Increase the sample or rebuild before relying on
   policy graph coverage.
