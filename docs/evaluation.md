@@ -443,6 +443,22 @@ strategi. Semua nilai ini tercatat di laporan pada field `run`, dan `compare` me
 peringatan pada laporan perbandingan bila antar-strategi ada perbedaan `top_k` atau model
 judge.
 
+### Perbandingan chunking dengan passage Recall@10
+
+`scripts/compare_chunking_recall.py` membandingkan snapshot indeks karakter dengan
+indeks token yang dibangun dari OCR cache yang sama. Pengukuran memakai span sumber
+kutipan referensi yang tetap, karena `chunk_id` berubah setelah rechunking.
+Recall@10 dihitung pada 10 seed sebelum ekspansi ±1; cakupan setelah ekspansi
+dilaporkan terpisah. Query yang kutipannya tidak seluruhnya dapat diverifikasi
+dikecualikan dan dicantumkan dalam laporan, tanpa mengurangi denominator parsial.
+
+Persiapan lokal: `uv run --no-sync python -m scripts.compare_chunking_recall`.
+Tambahkan `--run` untuk memanggil API embedding/reranker dan menghasilkan
+`experiments/chunking_recall_comparison.md`. Lihat laporan tersebut untuk metode,
+fingerprint corpus/dataset, hasil per query, volume token, dan batas generalisasi.
+Run ini tidak memanggil judge RAGAS atau mengubah indeks aktif. Checkpoint lokal
+berada di `.tmp_probe/chunking_comparison/`; panggilan API tetap dapat berbayar.
+
 ---
 
 ## Environment Variables
@@ -461,7 +477,7 @@ judge.
 | `RAGAS_EMBEDDING_PROVIDER` | ikut `EMBEDDING_PROVIDER` | Override provider OpenRouter untuk embedding RAGAS |
 | `RAGAS_LLM_REASONING_*` | ikut `LLM_REASONING_*` | Kontrol reasoning khusus judge |
 | `RETRIEVAL_STRATEGY` | `similarity` | `similarity`, `rrf`, atau `reranker` |
-| `RETRIEVAL_TOP_K` | `5` | Jumlah chunk yang diambil per pertanyaan |
+| `RETRIEVAL_TOP_K` | `5` | Batas chunk utama per pertanyaan; mode reranker juga menambahkan chunk tetangga ±1 sebagai konteks evaluasi |
 | `RETRIEVAL_MAX_QUERY_VARIANTS` | `2` | Jumlah varian query per turn |
 | `QDRANT_URL`, `QDRANT_API_KEY`, `QDRANT_COLLECTION_NAME` | — | Sumber chunk untuk live mode dan build-dataset |
 

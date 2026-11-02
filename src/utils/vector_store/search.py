@@ -7,7 +7,8 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, Literal
 
 from langchain_core.embeddings import Embeddings
-from qdrant_client.http.models import FieldCondition, Filter, MatchValue, SparseVector
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import FieldCondition, Filter, MatchAny, MatchValue, SparseVector
 
 from src.clients.redis import RedisCache
 from src.utils.state import DocumentType
@@ -21,7 +22,8 @@ class SearchOperations:
 
     _RRF_RELATIVE_KEEP_RATIO = 0.5
     _RERANKER_FINAL_SCORE_THRESHOLD = 0.0
-    _SEARCH_RESULT_SCHEMA_VERSION = "score-fields-v2"
+    _SEARCH_RESULT_SCHEMA_VERSION = "chunk-index-v3"
+    client: QdrantClient
     cache: RedisCache
     retrieval_strategy: RetrievalStrategy
     reranker_candidate_multiplier: int
@@ -135,6 +137,70 @@ class SearchOperations:
 
         return [resolved[index] for index in range(len(queries))]
 
+    async def expand_neighbors(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Append existing ±1 chunks from the same document, preserving seed ranking.
+
+        Neighbors inherit their seed's context score, not a reranker score.
+        Missing positions in legacy payloads and document boundaries are skipped.
+        """
+        targets: dict[tuple[str, int], dict[str, Any]] = {}
+        for result in results:
+            document_id = result.get("document_id")
+            index = result.get("chunk_index")
+            if not document_id or not isinstance(index, int):
+                continue
+            for neighbor_index in (index - 1, index + 1):
+                if neighbor_index >= 0:
+                    targets.setdefault((document_id, neighbor_index), result)
+        if not targets:
+            return results
+
+        positions: dict[str, list[int]] = {}
+        for document_id, index in targets:
+            positions.setdefault(document_id, []).append(index)
+        query_filter = Filter(
+            should=[
+                Filter(
+                    must=[
+                        FieldCondition(key="document_id", match=MatchValue(value=document_id)),
+                        FieldCondition(key="chunk_index", match=MatchAny(any=indices)),
+                    ]
+                )
+                for document_id, indices in positions.items()
+            ]
+        )
+        seen = {result["chunk_id"] for result in results}
+        neighbors: dict[tuple[str, int], dict[str, Any]] = {}
+        offset = None
+        while True:
+            points, offset = await asyncio.to_thread(
+                self.client.scroll,
+                collection_name=self.collection_name,
+                scroll_filter=query_filter,
+                limit=100,
+                with_payload=True,
+                with_vectors=False,
+                offset=offset,
+            )
+            for point in points:
+                payload = point.payload or {}
+                chunk_id = payload.get("chunk_id")
+                if not chunk_id or chunk_id in seen or not payload.get("text"):
+                    continue
+                key = (payload["document_id"], payload["chunk_index"])
+                seed = targets[key]
+                neighbors[key] = {
+                    **payload,
+                    "origin": "neighbor",
+                    "neighbor_of": seed["chunk_id"],
+                    "score": seed.get("score"),
+                    "final_score": seed.get("final_score", seed.get("score")),
+                }
+                seen.add(chunk_id)
+            if offset is None:
+                break
+        return results + [neighbors[key] for key in targets if key in neighbors]
+
     async def _search_one(
         self,
         query: str,
@@ -184,6 +250,7 @@ class SearchOperations:
                 "doc_title": payload.get("doc_title"),
                 "document_type": payload.get("document_type"),
                 "chunk_type": payload.get("chunk_type"),
+                "chunk_index": payload.get("chunk_index"),
                 "source_locations": payload.get("source_locations", []),
             }
         return hydrated

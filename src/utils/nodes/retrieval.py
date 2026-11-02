@@ -197,6 +197,9 @@ class RetrievalNode:
                 merged_results = self._pin_previous_evidence(
                     merged_results, state.conversation_evidence
                 )
+            merged_results = merged_results[: self.top_k]
+            if self.vector_tools.retrieval_strategy == "reranker":
+                merged_results = await self.vector_tools.expand_neighbors(merged_results)
             scope = doc_type.value if doc_type else "all"
             logger.info(
                 "Retrieved chunks",
@@ -211,7 +214,7 @@ class RetrievalNode:
                 },
             )
             return {
-                "retrieved_chunks": merged_results[: self.top_k],
+                "retrieved_chunks": merged_results,
                 "graph_trace": graph_trace,
                 "resolved_query": canonical_query,
                 "retrieval_scope": scope,
@@ -289,7 +292,7 @@ class RetrievalNode:
         for chunk in previous:
             if len(pinned) >= self._MAX_CARRIED_CHUNKS:
                 break
-            if chunk.get("carried_forward"):
+            if chunk.get("carried_forward") or chunk.get("origin") == "neighbor":
                 continue
             key = self._result_key(chunk)
             if key in seen:

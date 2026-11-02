@@ -12,6 +12,58 @@ from src.services.response_generation import (
 from src.utils.state import AgentState, Citation
 
 
+def test_unit_context_keeps_complete_token_bounded_chunk() -> None:
+    text = "Isi dokumen. " * 250 + "PERSYARATAN_TERAKHIR"
+    context = ResponseContextBuilder(top_k=1).build(
+        AgentState(retrieved_chunks=[{"chunk_id": "c1", "text": text, "score": 0.9}])
+    )
+    assert text in context
+
+
+def test_unit_response_includes_neighbors_beyond_top_k_with_matching_citations() -> None:
+    chunks = [
+        {"chunk_id": "a:chunk:1", "text": "Main rule", "score": 0.9},
+        {"chunk_id": "b:chunk:1", "text": "Outside top-k", "score": 0.8},
+        {
+            "chunk_id": "a:chunk:2",
+            "neighbor_of": "a:chunk:1",
+            "origin": "neighbor",
+            "filename": "a.pdf",
+            "text": "Additional requirement",
+            "source_locations": [{"page": 2}],
+            "score": 0.9,
+        },
+        {
+            "chunk_id": "b:chunk:2",
+            "neighbor_of": "b:chunk:1",
+            "origin": "neighbor",
+            "text": "Neighbor outside top-k",
+            "score": 0.8,
+        },
+    ]
+    llm = MagicMock()
+    llm.invoke.return_value = AIMessage(content="Additional requirement [2].")
+    service = ResponseGenerationService(
+        context_builder=ResponseContextBuilder(top_k=1),
+        citation_builder=CitationBuilder(limit=1),
+        llm_provider=lambda: llm,
+    )
+
+    result = service.generate(AgentState(retrieved_chunks=chunks))
+
+    assert "error" not in result
+    prompt = llm.invoke.call_args.args[0][0].content
+    assert "[2] a.pdf" in prompt
+    assert "Additional requirement" in prompt
+    assert "Outside top-k" not in prompt
+    assert "Neighbor outside top-k" not in prompt
+    assert [citation.chunk_id for citation in result["citations"]] == ["a:chunk:1", "a:chunk:2"]
+    neighbor_citation = result["citations"][1]
+    assert neighbor_citation.id == 2
+    assert neighbor_citation.is_cited is True
+    assert neighbor_citation.source_locations == [{"page": 2}]
+
+
 def test_unit_citation_builder_sequential_ids_and_metadata() -> None:
     """CitationBuilder creates 1-based sequential citations with rich metadata."""
     builder = CitationBuilder(limit=5)

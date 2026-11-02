@@ -94,7 +94,11 @@ REDIS_URL=redis://redis:6379/0
 
 # Retrieval
 RETRIEVAL_STRATEGY=reranker
+# Maximum seed chunks; reranker mode also adds their previous and next chunks
 RETRIEVAL_TOP_K=10
+CHUNK_SIZE_TOKENS=1024
+CHUNK_OVERLAP_TOKENS=128
+CHUNK_ENCODING=cl100k_base
 RERANKER_PROVIDER=openrouter
 RERANKER_MODEL=cohere/rerank-v3.5
 RERANKER_BASE_URL=https://openrouter.ai/api/v1

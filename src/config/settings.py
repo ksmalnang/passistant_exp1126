@@ -5,9 +5,9 @@ Loads environment variables from .env file with validation.
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal, Optional, Self
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -183,7 +183,7 @@ class Settings(BaseSettings):
     RETRIEVAL_TOP_K: int = Field(
         default=5,
         ge=1,
-        description="Number of hydrated context records to retrieve and expose to response generation",
+        description="Maximum seed chunks; reranker mode also exposes their ±1 document neighbors",
     )
     RETRIEVAL_MAX_QUERY_VARIANTS: int = Field(
         default=2,
@@ -252,19 +252,23 @@ class Settings(BaseSettings):
     )
 
     # --- Chunking Configuration ---
-    CHUNK_SIZE: int = Field(
-        default=1000,
-        ge=100,
-        description="Target character length per chunk for document indexing",
+    CHUNK_SIZE_TOKENS: int = Field(
+        default=1024,
+        ge=1,
+        description="Maximum tokens per indexed chunk, measured by CHUNK_ENCODING",
     )
-    CHUNK_OVERLAP: int = Field(
-        default=200,
+    CHUNK_OVERLAP_TOKENS: int = Field(
+        default=128,
         ge=0,
-        description="Character overlap between consecutive chunks",
+        description="Target token overlap between consecutive chunks",
+    )
+    CHUNK_ENCODING: str = Field(
+        default="cl100k_base",
+        description="Tiktoken encoding used to measure indexed chunks",
     )
     CHUNK_SEPARATORS: list[str] = Field(
         default_factory=lambda: ["\n\n", "\n", ". ", " ", ""],
-        description="Ordered separators for RecursiveCharacterTextSplitter",
+        description="Ordered separators for recursive token chunking",
     )
 
     # --- GraphRAG (Neo4j) Configuration ---
@@ -354,6 +358,12 @@ class Settings(BaseSettings):
     TELEGRAM_ENABLED: bool = Field(default=False)
     TELEGRAM_MAX_FILE_BYTES: int = Field(default=20_000_000)
     TELEGRAM_ALLOWED_FILE_MIME_TYPES: list[str] | None = Field(default=None)
+
+    @model_validator(mode="after")
+    def validate_chunk_overlap(self) -> Self:
+        if self.CHUNK_OVERLAP_TOKENS >= self.CHUNK_SIZE_TOKENS:
+            raise ValueError("CHUNK_OVERLAP_TOKENS must be smaller than CHUNK_SIZE_TOKENS")
+        return self
 
     @property
     def is_production(self) -> bool:

@@ -160,8 +160,9 @@ async def build(collection: str, reset: bool, doc_names: list[str]) -> dict:
         "collection": collection,
         "created_at": datetime.now(UTC).isoformat(),
         "settings": {
-            "chunk_size": settings.CHUNK_SIZE,
-            "chunk_overlap": settings.CHUNK_OVERLAP,
+            "chunk_size_tokens": settings.CHUNK_SIZE_TOKENS,
+            "chunk_overlap_tokens": settings.CHUNK_OVERLAP_TOKENS,
+            "chunk_encoding": settings.CHUNK_ENCODING,
             "chunk_separators": list(settings.CHUNK_SEPARATORS),
             "embedding_model": settings.EMBEDDING_MODEL,
             "vector_size": settings.VECTOR_SIZE,
@@ -181,14 +182,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--collection", required=True)
     parser.add_argument("--reset", action="store_true")
-    parser.add_argument("--chunk-size", type=int, default=1000)
-    parser.add_argument("--chunk-overlap", type=int, default=200)
+    parser.add_argument("--chunk-size", type=int, default=1024, help="Maximum tokens per chunk")
+    parser.add_argument("--chunk-overlap", type=int, default=128, help="Target token overlap")
+    parser.add_argument("--chunk-encoding", default="cl100k_base")
     parser.add_argument("--document", action="append", default=[])
     args = parser.parse_args()
 
     os.environ["QDRANT_COLLECTION_NAME"] = args.collection
-    os.environ["CHUNK_SIZE"] = str(args.chunk_size)
-    os.environ["CHUNK_OVERLAP"] = str(args.chunk_overlap)
+    os.environ["CHUNK_SIZE_TOKENS"] = str(args.chunk_size)
+    os.environ["CHUNK_OVERLAP_TOKENS"] = str(args.chunk_overlap)
+    os.environ["CHUNK_ENCODING"] = args.chunk_encoding
     if args.reset:
         os.environ["RESET_COLLECTION"] = "1"
 

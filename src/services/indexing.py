@@ -1,4 +1,4 @@
-"""Document indexing pipeline using RecursiveCharacterTextSplitter."""
+"""Document indexing with recursive token chunks and source offsets."""
 
 from __future__ import annotations
 
@@ -7,11 +7,12 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+import tiktoken
 from qdrant_client.http.models import PointStruct
 
 from src.clients.redis import RedisCache, get_cache
 from src.config import get_settings
+from src.services.chunking import split_token_spans
 from src.services.document_locks import knowledge_base_lock
 from src.utils.state import DocumentUpload
 
@@ -26,6 +27,9 @@ class ChunkMetadata:
     chunk_index: int
     text: str
     page_numbers: list[int]
+    start_char: int
+    end_char: int
+    token_count: int
 
 
 @dataclass(slots=True)
@@ -69,8 +73,9 @@ class DocumentIndexingService:
         self._graph_indexer = graph_indexer
 
         settings = get_settings()
-        self._chunk_size = settings.CHUNK_SIZE
-        self._chunk_overlap = settings.CHUNK_OVERLAP
+        self._chunk_size = settings.CHUNK_SIZE_TOKENS
+        self._chunk_overlap = settings.CHUNK_OVERLAP_TOKENS
+        self._chunk_encoding = settings.CHUNK_ENCODING
         self._chunk_separators = list(settings.CHUNK_SEPARATORS)
 
     async def index_document(
@@ -97,15 +102,14 @@ class DocumentIndexingService:
                 issues=["No extracted text available for indexing."],
             )
 
-        splitter = RecursiveCharacterTextSplitter(
+        spans = split_token_spans(
+            text,
             chunk_size=self._chunk_size,
             chunk_overlap=self._chunk_overlap,
             separators=self._chunk_separators,
-            length_function=len,
-            is_separator_regex=False,
+            encoding_name=self._chunk_encoding,
         )
-        raw_chunks: list[str] = splitter.split_text(text)
-        if not raw_chunks:
+        if not spans:
             return IndexingResult(
                 document_id=document.document_id,
                 chunk_count=0,
@@ -116,7 +120,7 @@ class DocumentIndexingService:
         page_boundaries = self._build_page_boundaries(document)
         chunks = self._build_chunk_metadata(
             document_id=document.document_id,
-            raw_chunks=raw_chunks,
+            spans=spans,
             full_text=text,
             page_boundaries=page_boundaries,
         )
@@ -192,23 +196,15 @@ class DocumentIndexingService:
         self,
         *,
         document_id: str,
-        raw_chunks: list[str],
+        spans: list[tuple[int, int]],
         full_text: str,
         page_boundaries: list[tuple[int, int]],
     ) -> list[ChunkMetadata]:
         """Assign a chunk ID, index, and page numbers to each raw chunk."""
         chunks: list[ChunkMetadata] = []
-        search_start = 0
-
-        for index, chunk_text in enumerate(raw_chunks):
-            chunk_start = full_text.find(chunk_text, search_start)
-            if chunk_start == -1:
-                # Fallback: if exact match fails, use current search position
-                chunk_start = search_start
-            chunk_end = chunk_start + len(chunk_text)
-            # Advance search start past the overlap region
-            search_start = max(chunk_start + 1, chunk_end - self._chunk_overlap)
-
+        encoder = tiktoken.get_encoding(self._chunk_encoding)
+        for index, (chunk_start, chunk_end) in enumerate(spans):
+            chunk_text = full_text[chunk_start:chunk_end]
             page_numbers = self._pages_for_span(chunk_start, chunk_end, page_boundaries)
 
             chunks.append(
@@ -217,6 +213,9 @@ class DocumentIndexingService:
                     chunk_index=index,
                     text=chunk_text,
                     page_numbers=page_numbers,
+                    start_char=chunk_start,
+                    end_char=chunk_end,
+                    token_count=len(encoder.encode_ordinary(chunk_text)),
                 )
             )
         return chunks
@@ -266,6 +265,12 @@ class DocumentIndexingService:
                 "document_type": document.document_type.value,
                 "chunk_type": "chunk",
                 "chunk_index": chunk.chunk_index,
+                "start_char": chunk.start_char,
+                "end_char": chunk.end_char,
+                "token_count": chunk.token_count,
+                "chunk_encoding": self._chunk_encoding,
+                "chunk_size_tokens": self._chunk_size,
+                "chunk_overlap_tokens": self._chunk_overlap,
                 "source_locations": [{"page": page} for page in chunk.page_numbers],
             }
 

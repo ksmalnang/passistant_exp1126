@@ -112,8 +112,9 @@ serializer configuration.
 
 ### Chunked Document Indexing
 
-Documents are OCR-processed and split into overlapping chunks using LangChain's
-`RecursiveCharacterTextSplitter`. Each chunk is embedded and upserted into Qdrant
+Documents are OCR-processed and recursively split into chunks of at most 1024
+`cl100k_base` tokens, with a target overlap of 128 tokens. Exact character spans
+are carried through splitting to preserve repeated-text locations. Each chunk is embedded and upserted into Qdrant
 with page-number metadata derived from OCR page boundaries, enabling page-level
 citations in retrieval results.
 

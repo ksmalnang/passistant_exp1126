@@ -81,6 +81,10 @@ class DocumentRetriever(Protocol):
         """Run one retrieval per query variant, sharing a single embedding batch."""
         ...
 
+    async def expand_neighbors(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Append deduplicated ±1 document chunks after final seed selection."""
+        ...
+
 
 @runtime_checkable
 class DocumentIndexer(Protocol):

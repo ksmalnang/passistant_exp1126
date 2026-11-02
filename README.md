@@ -25,6 +25,7 @@ A **LangGraph-powered RAG chatbot** for Universitas Pasundan's Faculty of Engine
 ## Features
 
 - **Document Indexing** — Uploaded documents are OCR-processed and indexed for retrieval with document type classification (10 types)
+- **Token Chunking** — Recursive chunks of at most 1024 `cl100k_base` tokens, target overlap 128, with exact source spans
 - **Contextual Embeddings** — Indexed text can include document-level context for better semantic matching
 - **Hybrid Retrieval** — Dense vector search + BM25 sparse vectors fused with RRF, or cross-encoder reranking
 - **Confidence Scoring** — Custom 5-component confidence model to rank and validate answers
@@ -85,7 +86,8 @@ flowchart LR
     
     Merge --> TopK[Top-K Results]
     TopK --> Score[Confidence Scoring]
-    Score --> LLM[LLM Response]
+    Score --> Neighbors["Add ±1 Neighbor Chunks - reranker only"]
+    Neighbors --> LLM[LLM Response]
 ```
 
 ---

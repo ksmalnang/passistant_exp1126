@@ -12,7 +12,8 @@ flowchart TD
     QP -->|"[q1, q2, q3]"| PS[2. Parallel Search]
     PS -->|candidates| RR[3. Reranking]
     RR -->|top-k| CS[4. Confidence Scoring]
-    CS --> OUT[Retrieved Context]
+    CS --> NE[5. Neighbor Expansion - reranker only]
+    NE --> OUT[Retrieved Context]
 
     subgraph QP[1. Query Processing]
         direction LR
@@ -64,7 +65,7 @@ Domain-specific Indonesian academic synonyms:
 flowchart LR
     PDF[PDF Upload] --> OCR[GLM-OCR]
     OCR -->|per-page| Text[Extracted Text]
-    Text --> Split[RecursiveCharacterTextSplitter]
+    Text --> Split[Recursive Token Chunks]
     Split -->|chunks| Embed[Batch Embed]
     Embed --> Qdrant[(Qdrant)]
 ```
@@ -94,17 +95,27 @@ A cache write failure is logged and never fails ingestion. Set
 `OCR_CACHE_ENABLED=false` to disable it. See
 [Reindexing from Cache](#7-reindexing-from-cache) below.
 
-### Chunked Indexing with RecursiveCharacterTextSplitter
+### Recursive Token Chunking
 
-Each ingested document is split into overlapping chunks using LangChain's
-`RecursiveCharacterTextSplitter`. The splitter tries separators in order
-(`\n\n`, `\n`, `. `, ` `, `""`) to find natural break points.
+Each ingested document is split into overlapping chunks measured with the
+`cl100k_base` tiktoken encoding. Ordered separators (`\n\n`, `\n`, `. `, ` `, `""`)
+preserve paragraph/sentence boundaries where possible. The recursive splitter
+carries character spans through splitting and merging; it does not search for
+chunk strings afterward, which would be ambiguous in repeated text. Actual
+merged text is token-counted, so the final chunk stays within the token budget.
 
 | Parameter | Default | Env Var |
 |-----------|---------|---------|
-| Chunk size | 1000 chars | `CHUNK_SIZE` |
-| Chunk overlap | 200 chars | `CHUNK_OVERLAP` |
+| Chunk size | 1024 tokens | `CHUNK_SIZE_TOKENS` |
+| Chunk overlap | 128 tokens | `CHUNK_OVERLAP_TOKENS` |
+| Token encoding | `cl100k_base` | `CHUNK_ENCODING` |
 | Separators | `["\n\n", "\n", ". ", " ", ""]` | `CHUNK_SEPARATORS` |
+
+Overlap is a target: whole separator-delimited pieces are retained only while
+they fit within that target. It can be smaller at paragraph/recursive boundaries.
+`0 <= CHUNK_OVERLAP_TOKENS < CHUNK_SIZE_TOKENS` is validated at configuration load.
+Literal tokenizer special-token strings in documents are counted as ordinary text.
+The budget refers to `cl100k_base`, independently of the embedding provider's tokenizer.
 
 Each chunk carries:
 - `chunk_id` — `{document_id}:chunk:{index}`
@@ -112,6 +123,8 @@ Each chunk carries:
 - `document_id`, `filename`, `doc_title`, `document_type`
 - `chunk_type` — `"chunk"`
 - `chunk_index` — zero-based position in the document
+- `start_char`, `end_char` — exact half-open source offsets
+- `token_count`, `chunk_encoding`, `chunk_size_tokens`, `chunk_overlap_tokens`
 - `source_locations` — list of `{"page": N}` objects (1-based page numbers
   derived from OCR page boundaries)
 
@@ -121,6 +134,17 @@ Page numbers are reconstructed from per-page OCR text lengths stored in
 `DocumentUpload.ocr_page_status`. Each chunk's character span is mapped
 against page boundaries so that chunks spanning multiple pages carry all
 relevant page numbers.
+
+Token overlap is never subtracted from character offsets. Retrieval context
+renders these complete chunks rather than truncating each one at 2000 characters.
+With ±1 expansion, up to `3 * RETRIEVAL_TOP_K` chunks can reach the generator;
+the total context is larger than the seed token budget alone.
+
+Migrate `.env` from `CHUNK_SIZE`/`CHUNK_OVERLAP` (characters) to the explicit token
+settings above. Legacy names are not interpreted as token settings. Existing
+Qdrant chunks remain unchanged until OCR-cache reindexing is requested; rebuilding
+requires new embedding calls, but no OCR. Qdrant/Neo4j chunk identities are rebuilt
+through the existing synchronization path.
 
 ### Embedding and Indexing
 
@@ -162,6 +186,21 @@ file while still deleting vectors and cached search results.
 - First stage: same as RRF or similarity (wider candidate pool, 6x multiplier)
 - Second stage: cross-encoder reranker scores each candidate (OpenRouter provider primary, with automatic Jina AI fallback)
 - Final threshold: score > 0.0
+- After merging query variants and selecting the final top-k seeds, the retrieval
+  node fetches each seed's previous and next chunk from Qdrant using the same
+  `document_id` and `chunk_index - 1` / `chunk_index + 1`. Search methods return
+  ranked seeds; `expand_neighbors()` adds context after final seed selection.
+- Seed order and scores are preserved. Neighbors are appended once by `chunk_id`,
+  even when adjacent seed windows overlap. Missing neighbors (including document
+  boundaries) and legacy seeds without `chunk_index` are skipped.
+- Neighbors retain their own text, identity, filename, title, and source pages.
+  They carry `origin="neighbor"` and `neighbor_of=<seed chunk_id>`. Their `score`
+  and `final_score` inherit the seed's context score; they are not reranked and
+  do not receive a `reranker_score`.
+- Confidence is calculated before neighbor expansion. `RETRIEVAL_TOP_K` limits
+  seeds; prompt context and citations also include their neighbors, for at most
+  three times that number of chunks. Similarity and RRF modes keep their current
+  top-k behavior. Previous-turn neighbors are not pinned as independent seeds.
 
 ### Score Fields
 
@@ -182,11 +221,12 @@ A custom 5-component model evaluates the final retrieved context to assign a con
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `RETRIEVAL_TOP_K` | 10 | Final number of retrieval records returned |
+| `RETRIEVAL_TOP_K` | 5 | Maximum seed chunks; reranker mode also adds their ±1 document neighbors |
 | `RETRIEVAL_STRATEGY` | reranker | Ranking strategy |
 | `RERANKER_CANDIDATE_MULTIPLIER` | 6 | First-stage overfetch ratio |
-| `CHUNK_SIZE` | 1000 | Target character length per chunk |
-| `CHUNK_OVERLAP` | 200 | Character overlap between consecutive chunks |
+| `CHUNK_SIZE_TOKENS` | 1024 | Maximum tokens per chunk |
+| `CHUNK_OVERLAP_TOKENS` | 128 | Target token overlap |
+| `CHUNK_ENCODING` | cl100k_base | Tiktoken encoding for chunk measurement |
 | `OCR_CACHE_ENABLED` | true | Persist raw per-page OCR output for reindexing |
 | `OCR_CACHE_DIR` | `DATA_DIR/processed/ocr_cache` | OCR cache location |
 | `REINDEX_JOB_TTL_SECONDS` | 86400 | TTL for async bulk reindex job records |
